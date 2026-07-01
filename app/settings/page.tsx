@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import {
   Heart, LayoutDashboard, MessageCircle, Activity, Settings,
-  ChevronRight, Menu, Bell, Shield, User, Smartphone, ChevronDown, Check
+  ChevronRight, Menu, Bell, Shield, User, Smartphone, ChevronDown, Check, LogOut
 } from 'lucide-react';
 
 const navItems = [
@@ -79,7 +79,7 @@ export default function SettingsPage() {
             );
           })}
         </nav>
-        <div className="p-4 border-t border-gray-100">
+        <div className="p-4 border-t border-gray-100 space-y-2">
           <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center flex-shrink-0">
               <span className="text-white font-bold text-sm">SJ</span>
@@ -89,6 +89,13 @@ export default function SettingsPage() {
               <p className="text-xs text-gray-400 truncate">Premium member</p>
             </div>
           </div>
+          <button
+            onClick={() => { window.location.href = '/'; }}
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all duration-200"
+          >
+            <LogOut className="w-4 h-4 flex-shrink-0" />
+            Sign out
+          </button>
         </div>
       </aside>
 
