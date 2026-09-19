@@ -2,8 +2,11 @@
 
 import { useState } from 'react';
 import { Heart, Mail, Lock, Eye, EyeOff, Activity } from 'lucide-react';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function LoginPage() {
+  const { m, fmt, formatNumber } = useI18n();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,12 +37,12 @@ export default function LoginPage() {
             </div>
             <span className="text-3xl font-bold text-white" style={{ fontFamily: 'Nunito, sans-serif' }}>HealthAI</span>
           </div>
-          <p className="mt-4 text-emerald-200 text-lg font-medium">Your AI-powered health companion</p>
+          <p className="mt-4 text-emerald-200 text-lg font-medium">{m.common.tagline}</p>
         </div>
 
         {/* Metric preview cards */}
         <div className="relative z-10 space-y-4">
-          <p className="text-emerald-300 text-sm font-semibold uppercase tracking-wider mb-6">Live Health Overview</p>
+          <p className="text-emerald-300 text-sm font-semibold uppercase tracking-wider mb-6">{m.login.liveOverview}</p>
 
           <div className="rounded-2xl p-4 border border-white/25" style={{ background: 'rgba(255,255,255,0.13)', backdropFilter: 'blur(8px)' }}>
             <div className="flex items-center justify-between">
@@ -48,11 +51,11 @@ export default function LoginPage() {
                   <Heart className="w-5 h-5 text-red-300" />
                 </div>
                 <div>
-                  <p className="text-white/60 text-xs font-medium">Heart Rate</p>
-                  <p className="text-white font-bold text-lg" style={{ fontFamily: 'Nunito, sans-serif' }}>72 <span className="text-sm font-normal text-white/60">bpm</span></p>
+                  <p className="text-white/60 text-xs font-medium">{m.login.heartRate}</p>
+                  <p className="text-white font-bold text-lg" style={{ fontFamily: 'Nunito, sans-serif' }}>72 <span className="text-sm font-normal text-white/60">{m.common.bpm}</span></p>
                 </div>
               </div>
-              <span className="text-emerald-200 text-xs bg-emerald-500/30 border border-emerald-400/30 px-2.5 py-1 rounded-full font-medium">Normal</span>
+              <span className="text-emerald-200 text-xs bg-emerald-500/30 border border-emerald-400/30 px-2.5 py-1 rounded-full font-medium">{m.login.normal}</span>
             </div>
           </div>
 
@@ -63,11 +66,11 @@ export default function LoginPage() {
                   <Activity className="w-5 h-5 text-purple-300" />
                 </div>
                 <div>
-                  <p className="text-white/60 text-xs font-medium">Sleep</p>
-                  <p className="text-white font-bold text-lg" style={{ fontFamily: 'Nunito, sans-serif' }}>7h 20m</p>
+                  <p className="text-white/60 text-xs font-medium">{m.login.sleep}</p>
+                  <p className="text-white font-bold text-lg" style={{ fontFamily: 'Nunito, sans-serif' }}>{fmt(m.common.duration, { hours: 7, minutes: 20 })}</p>
                 </div>
               </div>
-              <span className="text-emerald-200 text-xs bg-emerald-500/30 border border-emerald-400/30 px-2.5 py-1 rounded-full font-medium">Good</span>
+              <span className="text-emerald-200 text-xs bg-emerald-500/30 border border-emerald-400/30 px-2.5 py-1 rounded-full font-medium">{m.login.good}</span>
             </div>
           </div>
 
@@ -78,22 +81,24 @@ export default function LoginPage() {
                   <Activity className="w-5 h-5 text-amber-300" />
                 </div>
                 <div>
-                  <p className="text-white/60 text-xs font-medium">Steps Today</p>
-                  <p className="text-white font-bold text-lg" style={{ fontFamily: 'Nunito, sans-serif' }}>6,840</p>
+                  <p className="text-white/60 text-xs font-medium">{m.login.stepsToday}</p>
+                  <p className="text-white font-bold text-lg" style={{ fontFamily: 'Nunito, sans-serif' }}>{formatNumber(6840)}</p>
                 </div>
               </div>
-              <span className="text-amber-200 text-xs bg-amber-400/30 border border-amber-400/30 px-2.5 py-1 rounded-full font-medium">91% goal</span>
+              <span className="text-amber-200 text-xs bg-amber-400/30 border border-amber-400/30 px-2.5 py-1 rounded-full font-medium">{fmt(m.login.goalPercent, { percent: 91 })}</span>
             </div>
           </div>
         </div>
 
         <div className="relative z-10">
-          <p className="text-emerald-400 text-sm">Trusted by 50,000+ users worldwide</p>
+          <p className="text-emerald-400 text-sm">{m.common.trustedBy}</p>
         </div>
       </div>
 
       {/* Right side - Login form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-emerald-50">
+      <div className="relative w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-emerald-50">
+        <LanguageSwitcher className="absolute top-4 right-4" />
+
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
@@ -104,20 +109,20 @@ export default function LoginPage() {
           </div>
 
           <div className="animate-fade-in">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Nunito, sans-serif' }}>Welcome back</h1>
-            <p className="text-gray-500 mb-8">Sign in to your health dashboard</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Nunito, sans-serif' }}>{m.login.title}</h1>
+            <p className="text-gray-500 mb-8">{m.login.subtitle}</p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Email */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Email address</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{m.login.email}</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
+                    placeholder={m.login.emailPlaceholder}
                     className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 transition-all"
                     required
                   />
@@ -126,7 +131,7 @@ export default function LoginPage() {
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{m.login.password}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
@@ -150,7 +155,7 @@ export default function LoginPage() {
               {/* Forgot password */}
               <div className="flex justify-end">
                 <a href="#" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors">
-                  Forgot password?
+                  {m.login.forgotPassword}
                 </a>
               </div>
 
@@ -167,18 +172,18 @@ export default function LoginPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
-                    Signing in...
+                    {m.login.submitting}
                   </>
                 ) : (
-                  'Sign In'
+                  m.login.submit
                 )}
               </button>
             </form>
 
             <p className="mt-6 text-center text-gray-500 text-sm">
-              New to HealthAI?{' '}
+              {m.login.newHere}{' '}
               <a href="/signup" className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors">
-                Create account
+                {m.login.createAccount}
               </a>
             </p>
           </div>
