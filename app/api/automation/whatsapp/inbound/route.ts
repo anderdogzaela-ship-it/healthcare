@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { isAuthorizedAutomation, unauthorized } from '@/lib/automation/auth';
 import { detectIntent, REPLIES } from '@/lib/automation/templates';
+import { dispatchWebhook } from '@/lib/api/webhooks';
 import { isLocale } from '@/lib/i18n/config';
 
 const bodySchema = z.object({
@@ -61,7 +62,7 @@ export async function POST(request: Request) {
 
   const query = admin
     .from('appointments')
-    .select('id, starts_at, status')
+    .select('id, starts_at, status, clinic_id')
     .in('status', ['scheduled', 'confirmed'])
     .gt('starts_at', new Date().toISOString())
     .order('starts_at', { ascending: true })
@@ -95,6 +96,14 @@ export async function POST(request: Request) {
 
   if (intent === 'confirm') {
     await admin.from('appointments').update({ status: 'confirmed', confirmed_at: now }).eq('id', appointment.id);
+    if (appointment.clinic_id) {
+      await dispatchWebhook(appointment.clinic_id, 'appointment.confirmed', {
+        id: appointment.id,
+        starts_at: appointment.starts_at,
+        patient_id: sender.patientId ?? null,
+        source: 'whatsapp',
+      });
+    }
     return Response.json({ matched: true, intent, appointmentId: appointment.id, reply: REPLIES[locale].confirmed });
   }
 
@@ -106,6 +115,14 @@ export async function POST(request: Request) {
       .update({ status: 'skipped' })
       .eq('appointment_id', appointment.id)
       .eq('status', 'pending');
+    if (appointment.clinic_id) {
+      await dispatchWebhook(appointment.clinic_id, 'appointment.cancelled', {
+        id: appointment.id,
+        starts_at: appointment.starts_at,
+        patient_id: sender.patientId ?? null,
+        source: 'whatsapp',
+      });
+    }
     return Response.json({ matched: true, intent, appointmentId: appointment.id, reply: REPLIES[locale].cancelled });
   }
 

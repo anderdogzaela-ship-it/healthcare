@@ -9,6 +9,6 @@ export const config = {
   matcher: [
     // Everything except static assets, image files, and the machine-to-machine
     // endpoints, which authenticate themselves and have no session to refresh.
-    '/((?!_next/static|_next/image|favicon.ico|api/stripe|api/automation|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api/stripe|api/automation|api/v1|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

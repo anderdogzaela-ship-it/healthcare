@@ -19,6 +19,7 @@ export type AutomationChannel = 'whatsapp' | 'email' | 'sms';
 export type AutomationDirection = 'outbound' | 'inbound';
 export type ClinicRole = 'owner' | 'professional' | 'receptionist';
 export type PatientStatus = 'lead' | 'active' | 'inactive' | 'archived';
+export type WebhookStatus = 'pending' | 'delivered' | 'failed';
 export type SubscriptionStatus =
   | 'trialing' | 'active' | 'past_due' | 'canceled' | 'incomplete' | 'unpaid';
 
@@ -337,6 +338,63 @@ export interface Database {
         };
         Relationships: [];
       };
+      api_keys: {
+        Row: {
+          id: string;
+          clinic_id: string;
+          name: string;
+          prefix: string;
+          key_hash: string;
+          created_by: string | null;
+          last_used_at: string | null;
+          revoked_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          clinic_id: string;
+          prefix: string;
+          key_hash: string;
+          name?: string;
+          created_by?: string | null;
+        };
+        Update: { name?: string; last_used_at?: string | null; revoked_at?: string | null };
+        Relationships: [];
+      };
+      webhook_endpoints: {
+        Row: {
+          id: string;
+          clinic_id: string;
+          url: string;
+          secret: string;
+          events: string[];
+          active: boolean;
+          created_at: string;
+        };
+        Insert: { clinic_id: string; url: string; secret: string; events?: string[]; active?: boolean };
+        Update: { url?: string; events?: string[]; active?: boolean };
+        Relationships: [];
+      };
+      webhook_deliveries: {
+        Row: {
+          id: string;
+          endpoint_id: string;
+          clinic_id: string;
+          event_type: string;
+          status: WebhookStatus;
+          response_code: number | null;
+          error: string | null;
+          created_at: string;
+          delivered_at: string | null;
+        };
+        Insert: { endpoint_id: string; clinic_id: string; event_type: string; status?: WebhookStatus };
+        Update: {
+          status?: WebhookStatus;
+          response_code?: number | null;
+          error?: string | null;
+          delivered_at?: string | null;
+        };
+        Relationships: [];
+      };
       subscriptions: {
         Row: {
           clinic_id: string;
@@ -496,6 +554,7 @@ export interface Database {
       clinic_role: ClinicRole;
       patient_status: PatientStatus;
       subscription_status: SubscriptionStatus;
+      webhook_status: WebhookStatus;
     };
     CompositeTypes: Record<string, never>;
   };
