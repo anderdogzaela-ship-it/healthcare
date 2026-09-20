@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Heart, MessageCircle, Activity, Settings,
-  CalendarDays, ChevronRight, Menu, Bell, LogOut
+  CalendarDays, Building2, ChevronRight, Menu, Bell, LogOut
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { signOut } from '@/app/actions/auth';
@@ -14,6 +14,7 @@ const navItems = [
   { key: 'dashboard', icon: LayoutDashboard, path: '/dashboard' },
   { key: 'health', icon: Heart, path: '/health' },
   { key: 'appointments', icon: CalendarDays, path: '/appointments' },
+  { key: 'clinic', icon: Building2, path: '/clinic' },
   { key: 'chat', icon: MessageCircle, path: '/chat' },
   { key: 'activity', icon: Activity, path: '/activity' },
   { key: 'settings', icon: Settings, path: '/settings' },

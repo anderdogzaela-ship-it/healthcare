@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from './env';
 
 /** Routes that require a signed-in user. */
-const PROTECTED = ['/dashboard', '/health', '/appointments', '/chat', '/activity', '/settings'];
+const PROTECTED = ['/dashboard', '/health', '/appointments', '/clinic', '/chat', '/activity', '/settings'];
 /** Auth pages a signed-in user has no reason to see. */
 const AUTH_PAGES = ['/login', '/signup'];
 
