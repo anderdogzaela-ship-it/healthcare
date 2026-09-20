@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Heart, Mail, Lock, Eye, EyeOff, User, Activity, ShieldCheck } from 'lucide-react';
+import Link from 'next/link';
+import { Heart, Mail, Lock, Eye, EyeOff, User, Activity, ShieldCheck, ArrowLeft } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 
@@ -75,6 +76,13 @@ export default function SignUpPage() {
 
       {/* Right panel - Sign up form */}
       <div className="relative w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-emerald-50">
+        <Link
+          href="/"
+          className="absolute top-5 left-5 inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-emerald-700 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          HealthAI
+        </Link>
         <LanguageSwitcher className="absolute top-4 right-4" />
 
         <div className="w-full max-w-md">
@@ -203,9 +211,9 @@ export default function SignUpPage() {
 
             <p className="mt-6 text-center text-gray-500 text-sm">
               {m.signup.haveAccount}{' '}
-              <a href="/" className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors">
+              <Link href="/login" className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors">
                 {m.signup.signIn}
-              </a>
+              </Link>
             </p>
           </div>
         </div>

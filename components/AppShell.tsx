@@ -74,7 +74,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <Link
-            href="/"
+            href="/login"
             className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all duration-200"
           >
             <LogOut className="w-4 h-4 flex-shrink-0" />
