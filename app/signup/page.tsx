@@ -2,8 +2,17 @@
 
 import { useState } from 'react';
 import { Heart, Mail, Lock, Eye, EyeOff, User, Activity, ShieldCheck } from 'lucide-react';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+
+const features = [
+  { key: 'tracking', icon: Activity, color: 'text-purple-300' },
+  { key: 'insights', icon: Heart, color: 'text-red-300' },
+  { key: 'privacy', icon: ShieldCheck, color: 'text-emerald-300' },
+] as const;
 
 export default function SignUpPage() {
+  const { m, rich } = useI18n();
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -13,7 +22,7 @@ export default function SignUpPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (form.password !== form.confirm) {
-      setError('Passwords do not match.');
+      setError(m.signup.passwordMismatch);
       return;
     }
     setError('');
@@ -38,25 +47,21 @@ export default function SignUpPage() {
             </div>
             <span className="text-3xl font-bold text-white" style={{ fontFamily: 'Nunito, sans-serif' }}>HealthAI</span>
           </div>
-          <p className="mt-4 text-emerald-200 text-lg font-medium">Your AI-powered health companion</p>
+          <p className="mt-4 text-emerald-200 text-lg font-medium">{m.common.tagline}</p>
         </div>
 
         <div className="relative z-10 space-y-4">
-          <p className="text-emerald-300 text-sm font-semibold uppercase tracking-wider mb-6">What you get with HealthAI</p>
+          <p className="text-emerald-300 text-sm font-semibold uppercase tracking-wider mb-6">{m.signup.whatYouGet}</p>
 
-          {[
-            { icon: Activity, color: 'text-purple-300', title: 'Real-time health tracking', sub: 'Monitor vitals, sleep, and activity in one place' },
-            { icon: Heart, color: 'text-red-300', title: 'AI-powered insights', sub: 'Personalized recommendations based on your data' },
-            { icon: ShieldCheck, color: 'text-emerald-300', title: 'Private and secure', sub: 'Your health data is encrypted and never shared' },
-          ].map((item) => (
-            <div key={item.title} className="rounded-2xl p-4 border border-white/25" style={{ background: 'rgba(255,255,255,0.13)', backdropFilter: 'blur(8px)' }}>
+          {features.map((item) => (
+            <div key={item.key} className="rounded-2xl p-4 border border-white/25" style={{ background: 'rgba(255,255,255,0.13)', backdropFilter: 'blur(8px)' }}>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-white/15 rounded-xl flex items-center justify-center flex-shrink-0">
                   <item.icon className={`w-5 h-5 ${item.color}`} />
                 </div>
                 <div>
-                  <p className="text-white font-semibold text-sm">{item.title}</p>
-                  <p className="text-white/60 text-xs mt-0.5">{item.sub}</p>
+                  <p className="text-white font-semibold text-sm">{m.signup.features[item.key].title}</p>
+                  <p className="text-white/60 text-xs mt-0.5">{m.signup.features[item.key].description}</p>
                 </div>
               </div>
             </div>
@@ -64,12 +69,14 @@ export default function SignUpPage() {
         </div>
 
         <div className="relative z-10">
-          <p className="text-emerald-400 text-sm">Trusted by 50,000+ users worldwide</p>
+          <p className="text-emerald-400 text-sm">{m.common.trustedBy}</p>
         </div>
       </div>
 
       {/* Right panel - Sign up form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-emerald-50">
+      <div className="relative w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-emerald-50">
+        <LanguageSwitcher className="absolute top-4 right-4" />
+
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
@@ -80,20 +87,20 @@ export default function SignUpPage() {
           </div>
 
           <div className="animate-fade-in">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Nunito, sans-serif' }}>Create your account</h1>
-            <p className="text-gray-500 mb-8">Start your health journey today</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Nunito, sans-serif' }}>{m.signup.title}</h1>
+            <p className="text-gray-500 mb-8">{m.signup.subtitle}</p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Full name */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Full name</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.fullName}</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="text"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="Sarah Johnson"
+                    placeholder={m.signup.namePlaceholder}
                     className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 transition-all"
                     required
                   />
@@ -102,14 +109,14 @@ export default function SignUpPage() {
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Email address</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.email}</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="email"
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    placeholder="you@example.com"
+                    placeholder={m.signup.emailPlaceholder}
                     className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent bg-white text-gray-900 placeholder-gray-400 transition-all"
                     required
                   />
@@ -118,7 +125,7 @@ export default function SignUpPage() {
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.password}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
@@ -138,12 +145,12 @@ export default function SignUpPage() {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-                <p className="text-xs text-gray-400 mt-1.5">Must be at least 8 characters</p>
+                <p className="text-xs text-gray-400 mt-1.5">{m.signup.passwordHint}</p>
               </div>
 
               {/* Confirm password */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Confirm password</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.confirmPassword}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
@@ -167,10 +174,10 @@ export default function SignUpPage() {
 
               {/* Terms */}
               <p className="text-xs text-gray-400 leading-relaxed">
-                By creating an account you agree to our{' '}
-                <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">Terms of Service</a>
-                {' '}and{' '}
-                <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">Privacy Policy</a>.
+                {rich(m.signup.terms, {
+                  terms: <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">{m.signup.termsLink}</a>,
+                  privacy: <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">{m.signup.privacyLink}</a>,
+                })}
               </p>
 
               {/* Submit */}
@@ -186,18 +193,18 @@ export default function SignUpPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
-                    Creating account...
+                    {m.signup.submitting}
                   </>
                 ) : (
-                  'Create Account'
+                  m.signup.submit
                 )}
               </button>
             </form>
 
             <p className="mt-6 text-center text-gray-500 text-sm">
-              Already have an account?{' '}
+              {m.signup.haveAccount}{' '}
               <a href="/" className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors">
-                Sign in
+                {m.signup.signIn}
               </a>
             </p>
           </div>
