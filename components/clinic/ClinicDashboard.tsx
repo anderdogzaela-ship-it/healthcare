@@ -86,9 +86,14 @@ export default function ClinicDashboard({
           <p className="text-gray-500 mt-1">
             {m.clinic.subtitle} · <span className="text-gray-400">{m.clinic.roles[clinic.role]}</span>
           </p>
-          <Link href="/clinic/billing" className="mt-2 inline-block text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
-            {m.clinic.billingLink} →
-          </Link>
+          <div className="mt-2 flex flex-wrap gap-4">
+            <Link href="/clinic/billing" className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+              {m.clinic.billingLink} →
+            </Link>
+            <Link href="/clinic/integrations" className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+              {m.clinic.integrationsLink} →
+            </Link>
+          </div>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
