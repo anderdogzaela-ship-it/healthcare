@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import {
   Heart, Activity, Moon, AlertCircle, FileText, Star,
   CheckCircle, Save, Sparkles
 } from 'lucide-react';
+import { saveHealthLog } from '@/app/actions/health';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import type { Messages } from '@/lib/i18n/messages';
 
@@ -28,7 +29,8 @@ export default function HealthPage() {
   const [symptoms, setSymptoms] = useState<SymptomKey[]>([]);
   const [notes, setNotes] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(false);
+  const [pending, startTransition] = useTransition();
   const [showToast, setShowToast] = useState(false);
   const [now, setNow] = useState<Date | null>(null);
 
@@ -48,13 +50,35 @@ export default function HealthPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3000);
-    }, 1200);
+    setSaveFailed(false);
+
+    const formData = new FormData();
+    // The log day is the user's local date, not the server's.
+    const today = now ?? new Date();
+    const localDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    formData.set('logDate', localDate);
+    formData.set('heartRate', vitals.heartRate);
+    formData.set('systolic', vitals.systolic);
+    formData.set('diastolic', vitals.diastolic);
+    formData.set('weight', vitals.weight);
+    formData.set('steps', activityData.steps);
+    formData.set('exerciseType', activityData.exerciseType);
+    formData.set('durationMin', activityData.duration);
+    formData.set('sleepHours', sleep.hours);
+    if (sleep.quality > 0) formData.set('sleepQuality', String(sleep.quality));
+    symptoms.forEach((symptom) => formData.append('symptoms', symptom));
+    formData.set('notes', notes);
+
+    startTransition(async () => {
+      const result = await saveHealthLog(formData);
+      if (result.status === 'ok') {
+        setSubmitted(true);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 3000);
+      } else {
+        setSaveFailed(true);
+      }
+    });
   };
 
   const getHeartRateAnalysis = () => {
@@ -284,14 +308,22 @@ export default function HealthPage() {
               />
             </div>
 
+            {/* Save failure */}
+            {saveFailed && (
+              <div role="alert" className="flex items-start gap-2.5 p-3.5 rounded-2xl bg-red-50 border border-red-100 animate-fade-in">
+                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-700">{m.health.saveError}</p>
+              </div>
+            )}
+
             {/* Submit button */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={pending}
               className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold rounded-2xl hover:from-emerald-700 hover:to-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-emerald-200"
               style={{ fontFamily: 'Nunito, sans-serif' }}
             >
-              {loading ? (
+              {pending ? (
                 <>
                   <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />

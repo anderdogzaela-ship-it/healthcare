@@ -1,0 +1,186 @@
+openapi: 3.1.0
+info:
+  title: HealthAI public API
+  version: "1.0.0"
+  description: |
+    Per-clinic API for patients and appointments.
+
+    Authenticate with an API key created under Clinic → API and webhooks:
+    `Authorization: Bearer hai_...` (the header `x-api-key` also works).
+    A key is scoped to one clinic and can never read another clinic's data.
+servers:
+  - url: https://your-app.vercel.app/api/v1
+security:
+  - bearerAuth: []
+paths:
+  /me:
+    get:
+      summary: Check the key and see which clinic it belongs to
+      responses:
+        "200":
+          description: Key is valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      clinic:
+                        $ref: "#/components/schemas/Clinic"
+                      authenticated: { type: boolean }
+                      scopes:
+                        type: array
+                        items: { type: string }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /patients:
+    get:
+      summary: List patients
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, default: 50, maximum: 200 } }
+        - { name: offset, in: query, schema: { type: integer, default: 0 } }
+        - name: status
+          in: query
+          schema: { type: string, enum: [lead, active, inactive, archived] }
+      responses:
+        "200":
+          description: A page of patients
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Patient" }
+                  pagination:
+                    type: object
+                    properties:
+                      limit: { type: integer }
+                      offset: { type: integer }
+                      total: { type: integer }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      summary: Create a patient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [full_name]
+              properties:
+                full_name: { type: string, minLength: 2, maxLength: 120 }
+                phone: { type: string, description: "Any format; stored as +digits" }
+                email: { type: string, format: email }
+                date_of_birth: { type: string, format: date }
+                locale: { type: string, enum: [en, es, pt], default: en }
+                status: { type: string, enum: [lead, active, inactive], default: lead }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Patient" }
+        "400": { $ref: "#/components/responses/InvalidBody" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /appointments:
+    get:
+      summary: List appointments
+      parameters:
+        - { name: from, in: query, schema: { type: string, format: date-time } }
+        - { name: to, in: query, schema: { type: string, format: date-time } }
+        - { name: limit, in: query, schema: { type: integer, default: 50, maximum: 200 } }
+      responses:
+        "200":
+          description: Appointments in the range
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: "#/components/schemas/Appointment" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      summary: Book an appointment and queue its WhatsApp reminders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [patient_id, starts_at]
+              properties:
+                patient_id: { type: string, format: uuid }
+                starts_at:
+                  type: string
+                  format: date-time
+                  description: "ISO 8601 with offset, e.g. 2026-09-25T14:30:00-03:00"
+                duration_min: { type: integer, default: 30, minimum: 5, maximum: 480 }
+                professional: { type: string }
+                location: { type: string }
+                reason: { type: string }
+                reminders:
+                  type: boolean
+                  default: true
+                  description: Queue the 24h and 2h reminders
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Appointment" }
+        "400": { $ref: "#/components/responses/InvalidBody" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { description: The patient does not belong to this clinic }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  responses:
+    Unauthorized:
+      description: Missing, unknown or revoked API key
+    InvalidBody:
+      description: Validation failed; `detail` lists the offending fields
+  schemas:
+    Clinic:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        timezone: { type: string }
+        plan: { type: string }
+    Patient:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        full_name: { type: string }
+        email: { type: string, nullable: true }
+        phone: { type: string, nullable: true }
+        status: { type: string, enum: [lead, active, inactive, archived] }
+        locale: { type: string, enum: [en, es, pt] }
+        date_of_birth: { type: string, format: date, nullable: true }
+        created_at: { type: string, format: date-time }
+    Appointment:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        patient_id: { type: string, format: uuid, nullable: true }
+        starts_at: { type: string, format: date-time }
+        duration_min: { type: integer }
+        professional: { type: string }
+        location: { type: string, nullable: true }
+        reason: { type: string, nullable: true }
+        status:
+          type: string
+          enum: [scheduled, confirmed, cancelled, completed, no_show]

@@ -1,0 +1,136 @@
+{
+  "name": "HealthAI — WhatsApp inbound",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "healthai-whatsapp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "2b000000-0000-4000-8000-000000000001",
+      "name": "WhatsApp webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-420, 0],
+      "webhookId": "healthai-whatsapp"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.HEALTHAI_BASE_URL }}/api/automation/whatsapp/inbound",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{ $env.HEALTHAI_AUTOMATION_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ from: ($json.body?.From || '').replace('whatsapp:', ''), text: $json.body?.Body || '', providerMessageId: $json.body?.MessageSid }) }}",
+        "options": {}
+      },
+      "id": "2b000000-0000-4000-8000-000000000002",
+      "name": "Ask HealthAI what it means",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-180, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.reply }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2b000000-0000-4000-8000-000000000003",
+      "name": "Has a reply?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [60, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.twilio.com/2010-04-01/Accounts/{{ $env.TWILIO_ACCOUNT_SID }}/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "From",
+              "value": "={{ $env.TWILIO_WHATSAPP_FROM }}"
+            },
+            {
+              "name": "To",
+              "value": "={{ $('WhatsApp webhook').item.json.body.From }}"
+            },
+            {
+              "name": "Body",
+              "value": "={{ $json.reply }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2b000000-0000-4000-8000-000000000004",
+      "name": "Reply on WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [300, -100]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "ok",
+        "options": {}
+      },
+      "id": "2b000000-0000-4000-8000-000000000005",
+      "name": "Acknowledge",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [540, 0]
+    }
+  ],
+  "connections": {
+    "WhatsApp webhook": {
+      "main": [[{ "node": "Ask HealthAI what it means", "type": "main", "index": 0 }]]
+    },
+    "Ask HealthAI what it means": {
+      "main": [[{ "node": "Has a reply?", "type": "main", "index": 0 }]]
+    },
+    "Has a reply?": {
+      "main": [
+        [{ "node": "Reply on WhatsApp", "type": "main", "index": 0 }],
+        [{ "node": "Acknowledge", "type": "main", "index": 0 }]
+      ]
+    },
+    "Reply on WhatsApp": {
+      "main": [[{ "node": "Acknowledge", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}
