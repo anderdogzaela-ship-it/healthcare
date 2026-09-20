@@ -99,7 +99,7 @@ app/
   login, signup, forgot-password
   auth/callback         exchanges the emailed code for a session
   (app)/                signed-in area, guarded by the layout
-    dashboard, health, appointments, activity, settings, chat
+    dashboard, health, appointments, clinic, activity, settings, chat
   api/automation/       endpoints n8n calls (shared-secret auth)
   actions/              server actions: auth, health, appointments, settings
 automations/            n8n workflows and integration docs
@@ -122,6 +122,8 @@ supabase/migrations/    SQL schema
 - AI assistant answering from the user's own logged data
 - Appointments, with 24h and 2h reminders queued automatically and a WhatsApp
   bot that confirms, cancels or flags a reschedule from the patient's reply
+- Clinics with staff roles, a patient CRM (pipeline, notes, bookings) and
+  per-clinic data isolation enforced in the database
 - Full interface in English, Spanish and Portuguese
 
 ## The AI assistant
@@ -148,7 +150,8 @@ answer is one or more Claude calls, so watch usage in the Anthropic console.
 ## Not built yet
 
 - **Device sync**: Apple Health, Fitbit and Google Fit are shown as disabled.
-- **Clinic CRM and multi-tenant billing** described on the landing page.
+- **Subscription billing** (Stripe) for the plans shown on the landing page.
+- **Staff invitations**: a clinic owner cannot yet invite colleagues by email.
 - **Public API and webhooks** for third-party integrations.
 - Data export and account deletion.
 
