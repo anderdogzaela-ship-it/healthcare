@@ -6,7 +6,7 @@ export default async function SettingsPage() {
   const supabase = createClient();
 
   const [{ data: profile }, { data: settings }, { data: goals }] = await Promise.all([
-    supabase.from('profiles').select('full_name, date_of_birth, unit_system, timezone, plan, created_at').eq('id', user.id).single(),
+    supabase.from('profiles').select('full_name, phone, date_of_birth, unit_system, timezone, plan, created_at').eq('id', user.id).single(),
     supabase.from('user_settings').select('*').eq('user_id', user.id).single(),
     supabase.from('goals').select('metric, target, effective_from').eq('user_id', user.id).order('effective_from', { ascending: false }),
   ]);
@@ -17,6 +17,7 @@ export default async function SettingsPage() {
   const initial: SettingsFormData = {
     fullName: profile?.full_name ?? '',
     email: user.email ?? '',
+    phone: profile?.phone ?? '',
     dateOfBirth: profile?.date_of_birth ?? '',
     unitSystem: profile?.unit_system ?? 'metric',
     timezone: profile?.timezone ?? 'UTC',

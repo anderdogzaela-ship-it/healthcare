@@ -39,6 +39,8 @@ export type HealthLogInput = z.infer<typeof healthLogSchema>;
 
 export const profileSchema = z.object({
   fullName: z.string().trim().min(1).max(120),
+  // Digits, spaces and the usual separators; normalized to +digits on save.
+  phone: z.string().trim().max(30).regex(/^[+\d][\d\s().-]*$/).optional().or(z.literal('')),
   dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().or(z.literal('')),
   unitSystem: z.enum(['metric', 'imperial']),
   locale: localeSchema,

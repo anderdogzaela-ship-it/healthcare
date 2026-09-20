@@ -14,6 +14,7 @@ export async function updateSettings(formData: FormData): Promise<SettingsResult
 
   const profile = profileSchema.safeParse({
     fullName: formData.get('fullName'),
+    phone: formData.get('phone') ?? '',
     dateOfBirth: formData.get('dateOfBirth') ?? '',
     unitSystem: formData.get('unitSystem'),
     locale: formData.get('locale'),
@@ -38,10 +39,15 @@ export async function updateSettings(formData: FormData): Promise<SettingsResult
 
   const supabase = createClient();
 
+  // Stored as +digits so inbound WhatsApp messages match on lookup.
+  const digits = (profile.data.phone ?? '').replace(/\D/g, '');
+  const phone = digits ? `+${digits}` : null;
+
   const { error: profileError } = await supabase
     .from('profiles')
     .update({
       full_name: profile.data.fullName,
+      phone,
       date_of_birth: profile.data.dateOfBirth ? profile.data.dateOfBirth : null,
       unit_system: profile.data.unitSystem,
       locale: profile.data.locale,

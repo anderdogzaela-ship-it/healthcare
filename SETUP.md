@@ -28,7 +28,14 @@ cp .env.example .env.local
    NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key>
    NEXT_PUBLIC_SITE_URL=http://localhost:3000
    ANTHROPIC_API_KEY=sk-ant-...
+   SUPABASE_SERVICE_ROLE_KEY=<service role key>
+   AUTOMATION_API_KEY=<random 32+ character secret>
    ```
+
+   The last two are only needed for the appointment automations. The service
+   role key bypasses row level security and is used exclusively by the
+   `/api/automation` routes; `AUTOMATION_API_KEY` is the shared secret the
+   scheduler must send. See [automations/README.md](automations/README.md).
 
    `ANTHROPIC_API_KEY` (from [console.anthropic.com](https://console.anthropic.com))
    powers the AI assistant and is read only on the server. It must never be
@@ -92,8 +99,10 @@ app/
   login, signup, forgot-password
   auth/callback         exchanges the emailed code for a session
   (app)/                signed-in area, guarded by the layout
-    dashboard, health, activity, settings, chat
-  actions/              server actions: auth, health, settings
+    dashboard, health, appointments, activity, settings, chat
+  api/automation/       endpoints n8n calls (shared-secret auth)
+  actions/              server actions: auth, health, appointments, settings
+automations/            n8n workflows and integration docs
 components/             landing, app shell, dashboard, activity, settings
 lib/
   i18n/                 messages (en, es, pt) and the provider
@@ -111,6 +120,8 @@ supabase/migrations/    SQL schema
 - Dashboard and activity pages built from the signed-in user's own data
 - Settings, preferences and goals persisted
 - AI assistant answering from the user's own logged data
+- Appointments, with 24h and 2h reminders queued automatically and a WhatsApp
+  bot that confirms, cancels or flags a reschedule from the patient's reply
 - Full interface in English, Spanish and Portuguese
 
 ## The AI assistant
@@ -137,7 +148,8 @@ answer is one or more Claude calls, so watch usage in the Anthropic console.
 ## Not built yet
 
 - **Device sync**: Apple Health, Fitbit and Google Fit are shown as disabled.
-- **WhatsApp, CRM and automations** described on the landing page.
+- **Clinic CRM and multi-tenant billing** described on the landing page.
+- **Public API and webhooks** for third-party integrations.
 - Data export and account deletion.
 
 ## Working with health data

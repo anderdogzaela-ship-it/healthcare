@@ -33,6 +33,7 @@ const devices = [
 export interface SettingsFormData {
   fullName: string;
   email: string;
+  phone: string;
   dateOfBirth: string;
   unitSystem: 'metric' | 'imperial';
   timezone: string;
@@ -48,6 +49,7 @@ export default function SettingsForm({ initial }: { initial: SettingsFormData })
   const { m, fmt, formatDate, locale, setLocale } = useI18n();
   const [profile, setProfile] = useState({
     fullName: initial.fullName,
+    phone: initial.phone,
     dateOfBirth: initial.dateOfBirth,
     unitSystem: initial.unitSystem,
     timezone: initial.timezone,
@@ -64,6 +66,7 @@ export default function SettingsForm({ initial }: { initial: SettingsFormData })
 
     const formData = new FormData();
     formData.set('fullName', profile.fullName);
+    formData.set('phone', profile.phone);
     formData.set('dateOfBirth', profile.dateOfBirth);
     formData.set('unitSystem', profile.unitSystem);
     formData.set('timezone', profile.timezone);
@@ -161,6 +164,18 @@ export default function SettingsForm({ initial }: { initial: SettingsFormData })
               <label htmlFor="email" className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">{m.settings.email}</label>
               {/* Changing the sign-in email needs its own verification flow. */}
               <input id="email" type="email" value={initial.email} readOnly className={`${inputClass} bg-gray-50 text-gray-500`} />
+            </div>
+            <div className="sm:col-span-2">
+              <label htmlFor="phone" className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">{m.settings.phone}</label>
+              <input
+                id="phone"
+                type="tel"
+                value={profile.phone}
+                onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                placeholder="+55 11 99999-9999"
+                className={inputClass}
+              />
+              <p className="text-xs text-gray-400 mt-1.5">{m.settings.phoneHint}</p>
             </div>
             <div>
               <label htmlFor="dob" className="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">{m.settings.dateOfBirth}</label>
