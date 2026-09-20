@@ -546,6 +546,7 @@ export interface Database {
         Update: {
           send_at?: string;
           status?: ReminderStatus;
+          channel?: AutomationChannel;
           attempts?: number;
           sent_at?: string | null;
           error?: string | null;

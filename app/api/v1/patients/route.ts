@@ -27,7 +27,10 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const limit = Math.min(Number(searchParams.get('limit')) || 50, 200);
   const offset = Math.max(Number(searchParams.get('offset')) || 0, 0);
-  const status = searchParams.get('status');
+  const statusParam = searchParams.get('status');
+  const STATUSES = ['lead', 'active', 'inactive', 'archived'] as const;
+  // Only a known status reaches the query; anything else is ignored.
+  const status = STATUSES.find((value) => value === statusParam);
 
   const admin = createAdminClient();
   let query = admin

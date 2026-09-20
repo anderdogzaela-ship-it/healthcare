@@ -33,7 +33,9 @@ const rangeProperties = {
   to: { type: 'string' as const, description: 'End date, YYYY-MM-DD (inclusive).' },
 };
 
-export const tools: Anthropic.Tool[] = [
+// Typed as beta tools because the chat endpoint uses client.beta.messages,
+// where `strict` is available.
+export const tools: Anthropic.Beta.BetaTool[] = [
   {
     name: 'get_measurements',
     description:
