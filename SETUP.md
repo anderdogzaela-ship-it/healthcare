@@ -104,10 +104,18 @@ on Windows.
 
 ## Deploying to Vercel
 
-Add the same three variables under **Settings → Environment Variables**, with
+Add the same variables under **Settings → Environment Variables**, with
 `NEXT_PUBLIC_SITE_URL` set to the deployed URL. Add that domain to the Supabase
 Site URL and Redirect URLs as well, otherwise confirmation links will point at
 localhost.
+
+If you use the **Vercel–Supabase integration**, it injects `SUPABASE_URL`,
+`SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` by itself; the app reads
+either those or the `NEXT_PUBLIC_` spellings, so there is nothing to rename.
+
+The build never requires any of them: a missing variable surfaces at request
+time on the route that needs it, not as a failed deployment. So a deployment
+without `ANTHROPIC_API_KEY` works fine, with the assistant answering 503.
 
 ## Project layout
 

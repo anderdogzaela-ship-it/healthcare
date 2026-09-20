@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
-import { SUPABASE_ANON_KEY, SUPABASE_URL } from './env';
+import { supabaseAnonKey, supabaseUrl } from './env';
 
 /** Routes that require a signed-in user. */
 const PROTECTED = ['/dashboard', '/health', '/appointments', '/clinic', '/chat', '/activity', '/settings'];
@@ -15,7 +15,7 @@ const AUTH_PAGES = ['/login', '/signup'];
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
-  const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  const supabase = createServerClient(supabaseUrl(), supabaseAnonKey(), {
     cookies: {
       getAll() {
         return request.cookies.getAll();

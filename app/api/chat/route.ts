@@ -14,7 +14,19 @@ const MAX_TOOL_ROUNDS = 4;
 /** Per-user cost guard. */
 const MESSAGES_PER_HOUR = 40;
 
-const anthropic = new Anthropic();
+let client: Anthropic | null = null;
+
+/**
+ * Created on first use, not at import.
+ *
+ * The SDK throws when the key is missing, and a module-level client would turn
+ * that into a failed build for a deployment that simply has no assistant
+ * configured yet.
+ */
+function anthropic(): Anthropic {
+  if (!client) client = new Anthropic();
+  return client;
+}
 
 export async function POST(request: Request) {
   const user = await getUser();
@@ -26,6 +38,12 @@ export async function POST(request: Request) {
 
   if (!userMessage || userMessage.length > 4000) {
     return Response.json({ error: 'invalid_message' }, { status: 400 });
+  }
+
+  // Say so before storing anything, rather than saving the question and then
+  // failing to answer it.
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return Response.json({ error: 'not_configured' }, { status: 503 });
   }
 
   const supabase = createClient();
@@ -130,7 +148,7 @@ export async function POST(request: Request) {
 
       try {
         for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-          const turn = anthropic.beta.messages.stream({
+          const turn = anthropic().beta.messages.stream({
             model: MODEL,
             max_tokens: MAX_TOKENS,
             // Opus 5 can decline a request; "default" re-runs it on a fallback
