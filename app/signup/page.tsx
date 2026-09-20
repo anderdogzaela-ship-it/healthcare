@@ -1,9 +1,20 @@
 'use client';
 
-import { useState } from 'react';
-import { Heart, Mail, Lock, Eye, EyeOff, User, Activity, ShieldCheck } from 'lucide-react';
+import { useState, useTransition } from 'react';
+import Link from 'next/link';
+import { Heart, Mail, Lock, Eye, EyeOff, User, Activity, ShieldCheck, ArrowLeft, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useI18n } from '@/lib/i18n/I18nProvider';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { signUp, type AuthMessageKey } from '@/app/actions/auth';
+
+const features = [
+  { key: 'tracking', icon: Activity, color: 'text-purple-300' },
+  { key: 'insights', icon: Heart, color: 'text-red-300' },
+  { key: 'privacy', icon: ShieldCheck, color: 'text-emerald-300' },
+] as const;
 
 export default function SignUpPage() {
+  const { m, fmt, rich, locale } = useI18n();
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
   const [consent, setConsent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -84,7 +95,16 @@ export default function SignUpPage() {
       </div>
 
       {/* Right panel - Sign up form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-emerald-50">
+      <div className="relative w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-slate-50 to-emerald-50">
+        <Link
+          href="/"
+          className="absolute top-5 left-5 inline-flex items-center gap-1.5 text-sm font-semibold text-gray-500 hover:text-emerald-700 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          HealthAI
+        </Link>
+        <LanguageSwitcher className="absolute top-4 right-4" />
+
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
@@ -95,9 +115,19 @@ export default function SignUpPage() {
           </div>
 
           <div className="animate-fade-in">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Nunito, sans-serif' }}>Create your account</h1>
-            <p className="text-gray-500 mb-8">Start your health journey today</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Nunito, sans-serif' }}>{m.signup.title}</h1>
+            <p className="text-gray-500 mb-8">{m.signup.subtitle}</p>
 
+            {sentTo ? (
+              <div className="p-6 rounded-2xl bg-emerald-50 border border-emerald-100 animate-slide-up">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="w-7 h-7 text-emerald-600 flex-shrink-0" />
+                  <p className="text-sm text-emerald-800 leading-relaxed">
+                    {fmt(m.auth.checkEmail, { email: sentTo })}
+                  </p>
+                </div>
+              </div>
+            ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Error from the server action */}
               {errorKey && (
@@ -109,7 +139,7 @@ export default function SignUpPage() {
 
               {/* Full name */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Full name</label>
+                <label htmlFor="signup-name" className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.fullName}</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
@@ -126,7 +156,7 @@ export default function SignUpPage() {
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Email address</label>
+                <label htmlFor="signup-email" className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.email}</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
@@ -143,7 +173,7 @@ export default function SignUpPage() {
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+                <label htmlFor="signup-password" className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.password}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
@@ -169,7 +199,7 @@ export default function SignUpPage() {
 
               {/* Confirm password */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Confirm password</label>
+                <label htmlFor="signup-confirm" className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.confirmPassword}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
@@ -192,13 +222,23 @@ export default function SignUpPage() {
                 {error && <p className="text-xs text-red-500 mt-1.5">{error}</p>}
               </div>
 
-              {/* Terms */}
-              <p className="text-xs text-gray-400 leading-relaxed">
-                By creating an account you agree to our{' '}
-                <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">Terms of Service</a>
-                {' '}and{' '}
-                <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">Privacy Policy</a>.
-              </p>
+              {/* Explicit consent: health data is sensitive personal data, so
+                  it needs a specific, recorded opt-in rather than a notice. */}
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(e) => { setConsent(e.target.checked); setErrorKey(null); }}
+                  className="mt-0.5 w-4 h-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                  required
+                />
+                <span className="text-xs text-gray-500 leading-relaxed">
+                  {rich(m.auth.consentLabel, {
+                    terms: <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">{m.signup.termsLink}</a>,
+                    privacy: <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">{m.signup.privacyLink}</a>,
+                  })}
+                </span>
+              </label>
 
               {/* Submit */}
               <button
@@ -223,10 +263,10 @@ export default function SignUpPage() {
             )}
 
             <p className="mt-6 text-center text-gray-500 text-sm">
-              Already have an account?{' '}
-              <a href="/" className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors">
-                Sign in
-              </a>
+              {m.signup.haveAccount}{' '}
+              <Link href="/login" className="text-emerald-600 hover:text-emerald-700 font-semibold transition-colors">
+                {m.signup.signIn}
+              </Link>
             </p>
           </div>
         </div>
