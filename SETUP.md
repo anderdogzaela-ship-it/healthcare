@@ -147,10 +147,27 @@ Server-side fallbacks are enabled, so if the model declines a request it is
 retried on a fallback model instead of failing. Cost scales with use: each
 answer is one or more Claude calls, so watch usage in the Anthropic console.
 
+## Billing (optional)
+
+Leave the Stripe variables empty and the app still runs: every clinic stays on
+the starter plan and the billing page says so. To turn subscriptions on:
+
+1. Create two recurring prices in the Stripe dashboard and put their ids in
+   `STRIPE_PRICE_STARTER` and `STRIPE_PRICE_CLINIC`.
+2. Add `STRIPE_SECRET_KEY`.
+3. Point a webhook endpoint at `https://<your-domain>/api/stripe/webhook` for
+   `checkout.session.completed`, `customer.subscription.*` and
+   `invoice.payment_failed`, then put its signing secret in
+   `STRIPE_WEBHOOK_SECRET`. Locally: `stripe listen --forward-to localhost:3000/api/stripe/webhook`.
+
+Stripe owns the billing state; the `subscriptions` table mirrors it so the app
+can check a plan without calling Stripe on every request. **Plan limits are
+enforced**, not just displayed: adding a patient beyond the plan's limit is
+refused with an upgrade prompt.
+
 ## Not built yet
 
 - **Device sync**: Apple Health, Fitbit and Google Fit are shown as disabled.
-- **Subscription billing** (Stripe) for the plans shown on the landing page.
 - **Staff invitations**: a clinic owner cannot yet invite colleagues by email.
 - **Public API and webhooks** for third-party integrations.
 - Data export and account deletion.

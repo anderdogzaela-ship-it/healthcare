@@ -4,8 +4,11 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createClient, requireUser } from '@/lib/supabase/server';
 import { getClinicContext } from '@/lib/data/clinic';
+import { canAddPatient } from '@/lib/billing/limits';
 
-export type ClinicResult = { status: 'ok'; id?: string } | { status: 'error'; reason: 'invalid' | 'failed' | 'forbidden' };
+export type ClinicResult =
+  | { status: 'ok'; id?: string }
+  | { status: 'error'; reason: 'invalid' | 'failed' | 'forbidden' | 'limit' };
 
 const clinicSchema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -63,6 +66,9 @@ export async function createPatient(formData: FormData): Promise<ClinicResult> {
   const user = await requireUser();
   const clinic = await getClinicContext(user.id);
   if (!clinic) return { status: 'error', reason: 'forbidden' };
+
+  // Plan limits are enforced here, not only advertised on the pricing page.
+  if (!(await canAddPatient(clinic.id))) return { status: 'error', reason: 'limit' };
 
   const parsed = patientSchema.safeParse({
     fullName: formData.get('fullName'),

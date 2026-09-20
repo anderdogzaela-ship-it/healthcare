@@ -37,7 +37,7 @@ export default function ClinicDashboard({
   const router = useRouter();
   const [term, setTerm] = useState(search);
   const [showForm, setShowForm] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState<'generic' | 'limit' | null>(null);
   const [pending, startTransition] = useTransition();
 
   const runSearch = (event: React.FormEvent) => {
@@ -47,7 +47,7 @@ export default function ClinicDashboard({
 
   const handleCreate = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setFailed(false);
+    setFailed(null);
     const formData = new FormData(event.currentTarget);
 
     startTransition(async () => {
@@ -56,7 +56,7 @@ export default function ClinicDashboard({
         setShowForm(false);
         router.refresh();
       } else {
-        setFailed(true);
+        setFailed(result.reason === 'limit' ? 'limit' : 'generic');
       }
     });
   };
@@ -86,6 +86,9 @@ export default function ClinicDashboard({
           <p className="text-gray-500 mt-1">
             {m.clinic.subtitle} · <span className="text-gray-400">{m.clinic.roles[clinic.role]}</span>
           </p>
+          <Link href="/clinic/billing" className="mt-2 inline-block text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+            {m.clinic.billingLink} →
+          </Link>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
@@ -116,7 +119,9 @@ export default function ClinicDashboard({
           {failed && (
             <div role="alert" className="mb-4 flex items-start gap-2.5 p-3.5 rounded-xl bg-red-50 border border-red-100">
               <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-700">{m.clinic.saveError}</p>
+              <p className="text-sm text-red-700">
+                {failed === 'limit' ? m.billing.limitReached : m.clinic.saveError}
+              </p>
             </div>
           )}
 
