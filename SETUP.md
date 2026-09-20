@@ -129,6 +129,7 @@ supabase/migrations/    SQL schema
 - Subscriptions with plan limits that are actually enforced, including seats
 - A public API with per-clinic keys and signed webhooks, documented in
   [automations/api/](automations/api/)
+- Data export and account deletion, as the LGPD and GDPR require
 - Full interface in English, Spanish and Portuguese
 
 ## The AI assistant
@@ -176,7 +177,7 @@ refused with an upgrade prompt.
 - **Sending invitation emails**: the invitation link is generated and shown to
   the owner to share; no email is sent yet.
 - **Per-scope API permissions**: a key can do everything its clinic can.
-- Data export and account deletion.
+- **Clinic-level export**: owners cannot yet download the whole patient list.
 
 ## Working with health data
 

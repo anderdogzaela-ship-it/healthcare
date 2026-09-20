@@ -1,10 +1,14 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Bell, Shield, User, Smartphone, ChevronDown, Check, Target, AlertCircle } from 'lucide-react';
+import {
+  Bell, Shield, User, Smartphone, ChevronDown, Check, Target, AlertCircle,
+  Download, Trash2
+} from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { locales, localeNames, type Locale } from '@/lib/i18n/config';
 import { updateSettings } from '@/app/actions/settings';
+import { deleteAccount } from '@/app/actions/account';
 
 function Toggle({ on, onChange, label }: { on: boolean; onChange: () => void; label: string }) {
   return (
@@ -60,6 +64,27 @@ export default function SettingsForm({ initial }: { initial: SettingsFormData })
   const [saved, setSaved] = useState(false);
   const [failed, setFailed] = useState(false);
   const [pending, startTransition] = useTransition();
+  const [confirmEmail, setConfirmEmail] = useState('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleting, startDeleting] = useTransition();
+
+  const handleDelete = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setDeleteError(null);
+    const formData = new FormData(event.currentTarget);
+
+    startDeleting(async () => {
+      // On success the action signs the user out and redirects.
+      const result = await deleteAccount(formData);
+      if (result?.status === 'error') {
+        setDeleteError(
+          result.reason === 'mismatch' ? m.settings.deleteMismatch
+          : result.reason === 'soleOwner' ? m.settings.deleteSoleOwner
+          : m.settings.deleteFailed
+        );
+      }
+    });
+  };
 
   const handleSave = () => {
     setFailed(false);
@@ -321,6 +346,67 @@ export default function SettingsForm({ initial }: { initial: SettingsFormData })
           <div className="mt-4 p-3 bg-purple-50 rounded-xl border border-purple-100">
             <p className="text-xs text-purple-700 leading-relaxed">{m.settings.privacyNote}</p>
           </div>
+        </div>
+
+        {/* Your data */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center">
+              <Download className="w-5 h-5 text-blue-500" />
+            </div>
+            <h2 className="font-bold text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>{m.settings.dataTitle}</h2>
+          </div>
+          <p className="text-sm text-gray-500">{m.settings.exportHint}</p>
+          <a
+            href="/api/account/export"
+            download
+            className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-200 hover:border-emerald-300 hover:text-emerald-700 transition-all"
+          >
+            <Download className="w-4 h-4" />
+            {m.settings.exportButton}
+          </a>
+        </div>
+
+        {/* Delete account */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-red-100">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center">
+              <Trash2 className="w-5 h-5 text-red-500" />
+            </div>
+            <h2 className="font-bold text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>{m.settings.dangerTitle}</h2>
+          </div>
+          <p className="text-sm text-gray-500">{m.settings.dangerHint}</p>
+
+          {deleteError && (
+            <div role="alert" className="mt-4 flex items-start gap-2.5 p-3.5 rounded-xl bg-red-50 border border-red-100">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-700">{deleteError}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleDelete} className="mt-4 flex flex-col sm:flex-row gap-3 sm:items-end">
+            <div className="flex-1">
+              <label htmlFor="confirm-email" className="block text-xs font-semibold text-gray-500 mb-1.5">
+                {fmt(m.settings.deleteConfirmLabel, { email: initial.email })}
+              </label>
+              <input
+                id="confirm-email"
+                name="confirmEmail"
+                type="email"
+                required
+                value={confirmEmail}
+                onChange={(event) => setConfirmEmail(event.target.value)}
+                className={inputClass}
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={deleting || confirmEmail.trim().toLowerCase() !== initial.email.toLowerCase()}
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-red-500 hover:bg-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+            >
+              {deleting ? m.settings.deleting : m.settings.deleteButton}
+            </button>
+          </form>
         </div>
 
         {/* Connected devices */}
