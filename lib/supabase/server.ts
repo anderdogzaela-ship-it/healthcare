@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { redirect } from 'next/navigation';
-import { SUPABASE_ANON_KEY, SUPABASE_URL } from './env';
+import { supabaseAnonKey, supabaseUrl } from './env';
 import type { Database } from './database.types';
 
 /**
@@ -12,7 +12,7 @@ import type { Database } from './database.types';
 export function createClient() {
   const cookieStore = cookies();
 
-  return createServerClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  return createServerClient<Database>(supabaseUrl(), supabaseAnonKey(), {
     cookies: {
       getAll() {
         return cookieStore.getAll();

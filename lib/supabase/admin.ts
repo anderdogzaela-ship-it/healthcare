@@ -1,5 +1,5 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { SUPABASE_URL } from './env';
+import { supabaseUrl } from './env';
 import type { Database } from './database.types';
 
 /**
@@ -16,7 +16,7 @@ export function createAdminClient() {
     throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY: required by the automation endpoints.');
   }
 
-  return createSupabaseClient<Database>(SUPABASE_URL, serviceKey, {
+  return createSupabaseClient<Database>(supabaseUrl(), serviceKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 }
