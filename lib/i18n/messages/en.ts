@@ -144,6 +144,11 @@ const en = {
     logHealth: { title: 'Log Health Data', description: 'Record vitals & symptoms' },
     askAssistant: { title: 'Ask AI Assistant', description: 'Get health insights' },
     weeklyActivity: '7-Day Activity',
+    noValue: 'No data yet',
+    empty: {
+      title: 'Your dashboard is waiting for its first entry',
+      description: 'Log today’s vitals, sleep and activity and your trends will start appearing here.',
+    },
   },
   health: {
     title: 'Health Log',
@@ -207,6 +212,7 @@ const en = {
         'Keep logging daily to see trend insights and personalized recommendations from your AI health companion.',
     },
     toast: 'Health log saved!',
+    saveError: 'We could not save your log. Check the values and try again.',
   },
   activity: {
     title: 'Activity',

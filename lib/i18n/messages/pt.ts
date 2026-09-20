@@ -145,6 +145,11 @@ const pt: Messages = {
     logHealth: { title: 'Registrar dados de saúde', description: 'Anote sinais vitais e sintomas' },
     askAssistant: { title: 'Perguntar ao assistente de IA', description: 'Receba análises de saúde' },
     weeklyActivity: 'Atividade dos últimos 7 dias',
+    noValue: 'Ainda sem dados',
+    empty: {
+      title: 'Seu painel está esperando o primeiro registro',
+      description: 'Registre os sinais vitais, o sono e a atividade de hoje e suas tendências começarão a aparecer aqui.',
+    },
   },
   health: {
     title: 'Registro de saúde',
@@ -209,6 +214,7 @@ const pt: Messages = {
         'Continue registrando diariamente para ver tendências e recomendações personalizadas do seu companheiro de saúde com IA.',
     },
     toast: 'Registro de saúde salvo!',
+    saveError: 'Não foi possível salvar seu registro. Confira os valores e tente novamente.',
   },
   activity: {
     title: 'Atividade',
