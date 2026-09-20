@@ -8,6 +8,7 @@ import {
   ChevronRight, Menu, Bell, LogOut
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
+import { signOut } from '@/app/actions/auth';
 
 const navItems = [
   { key: 'dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -18,7 +19,22 @@ const navItems = [
 ] as const;
 
 // Sidebar + mobile header shared by every signed-in page.
-export default function AppShell({ children }: { children: React.ReactNode }) {
+export default function AppShell({
+  children,
+  userName,
+  plan,
+}: {
+  children: React.ReactNode;
+  userName: string;
+  plan: string;
+}) {
+  const initials = userName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('') || '?';
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
   const { m } = useI18n();
@@ -66,20 +82,24 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <div className="p-4 border-t border-gray-100 space-y-2">
           <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-sm">SJ</span>
+              <span className="text-white font-bold text-sm">{initials}</span>
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">Sarah Johnson</p>
-              <p className="text-xs text-gray-400 truncate">{m.common.premiumMember}</p>
+              <p className="text-sm font-semibold text-gray-900 truncate">{userName}</p>
+              <p className="text-xs text-gray-400 truncate">{plan}</p>
             </div>
           </div>
-          <Link
-            href="/login"
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all duration-200"
-          >
-            <LogOut className="w-4 h-4 flex-shrink-0" />
-            {m.common.signOut}
-          </Link>
+          {/* Sign out has to be a POST-style action, not a link, so the
+              session cookie is actually cleared on the server. */}
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all duration-200"
+            >
+              <LogOut className="w-4 h-4 flex-shrink-0" />
+              {m.common.signOut}
+            </button>
+          </form>
         </div>
       </aside>
 

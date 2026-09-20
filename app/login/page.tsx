@@ -1,24 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState, useTransition } from 'react';
 import Link from 'next/link';
-import { Heart, Mail, Lock, Eye, EyeOff, Activity, ArrowLeft } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { Heart, Mail, Lock, Eye, EyeOff, Activity, ArrowLeft, AlertCircle } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { signIn, type AuthMessageKey } from '@/app/actions/auth';
 
-export default function LoginPage() {
+function LoginForm() {
   const { m, fmt, formatNumber } = useI18n();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [errorKey, setErrorKey] = useState<AuthMessageKey | null>(null);
+  const [pending, startTransition] = useTransition();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      window.location.href = '/dashboard';
-    }, 1200);
+    setErrorKey(null);
+
+    const formData = new FormData();
+    formData.set('email', email);
+    formData.set('password', password);
+    const next = searchParams.get('next');
+    if (next) formData.set('next', next);
+
+    startTransition(async () => {
+      // On success the action redirects, so nothing comes back here.
+      const result = await signIn(formData);
+      if (result?.status === 'error') setErrorKey(result.messageKey);
+    });
   };
 
   return (
@@ -121,6 +134,14 @@ export default function LoginPage() {
             <p className="text-gray-500 mb-8">{m.login.subtitle}</p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Error from the server action */}
+              {errorKey && (
+                <div role="alert" className="flex items-start gap-2.5 p-3.5 rounded-xl bg-red-50 border border-red-100 animate-fade-in">
+                  <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-700">{m.auth[errorKey]}</p>
+                </div>
+              )}
+
               {/* Email */}
               <div>
                 <label htmlFor="login-email" className="block text-sm font-semibold text-gray-700 mb-2">{m.login.email}</label>
@@ -165,19 +186,19 @@ export default function LoginPage() {
 
               {/* Forgot password */}
               <div className="flex justify-end">
-                <a href="#" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors">
+                <Link href="/forgot-password" className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors">
                   {m.login.forgotPassword}
-                </a>
+                </Link>
               </div>
 
               {/* Submit button */}
               <button
                 type="submit"
-                disabled={loading}
+                disabled={pending}
                 className="w-full py-3 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold rounded-xl hover:from-emerald-700 hover:to-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-emerald-200"
                 style={{ fontFamily: 'Nunito, sans-serif' }}
               >
-                {loading ? (
+                {pending ? (
                   <>
                     <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -201,5 +222,14 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// useSearchParams needs a Suspense boundary above it.
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

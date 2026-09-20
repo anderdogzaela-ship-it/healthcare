@@ -37,6 +37,18 @@ const en = {
     yoga: 'Yoga',
     weightlifting: 'Weightlifting',
   },
+  auth: {
+    invalidCredentials: 'Wrong email or password.',
+    emailNotConfirmed: 'Confirm your email address before signing in. Check your inbox.',
+    emailInUse: 'An account with this email already exists.',
+    weakPassword: 'Choose a password with at least 8 characters.',
+    rateLimited: 'Too many attempts. Please wait a moment and try again.',
+    generic: 'Something went wrong. Please try again.',
+    checkEmail: 'Almost there: we sent a confirmation link to {email}.',
+    resetSent: 'If that email has an account, a reset link is on its way.',
+    consentRequired: 'Please accept the terms to create your account.',
+    consentLabel: 'I agree to the {terms} and the {privacy}, including the processing of my health data.',
+  },
   login: {
     liveOverview: 'Live Health Overview',
     heartRate: 'Heart Rate',
@@ -55,6 +67,13 @@ const en = {
     submitting: 'Signing in...',
     newHere: 'New to HealthAI?',
     createAccount: 'Create account',
+  },
+  forgot: {
+    title: 'Reset your password',
+    subtitle: 'Enter your email address and we will send you a reset link.',
+    submit: 'Send reset link',
+    sending: 'Sending...',
+    back: 'Back to sign in',
   },
   signup: {
     whatYouGet: 'What you get with HealthAI',

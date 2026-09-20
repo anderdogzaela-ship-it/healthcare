@@ -215,6 +215,12 @@ begin
     (new.id, 'sleep_hours', 8),
     (new.id, 'water_glasses', 8);
 
+  -- Consent accepted on the sign-up form, passed as user metadata.
+  if new.raw_user_meta_data ? 'consent_version' then
+    insert into public.consents (user_id, consent_type, version)
+    values (new.id, 'terms_privacy_health_data', new.raw_user_meta_data ->> 'consent_version');
+  end if;
+
   return new;
 end;
 $$;

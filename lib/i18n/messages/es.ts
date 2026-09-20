@@ -38,6 +38,18 @@ const es: Messages = {
     yoga: 'Yoga',
     weightlifting: 'Levantamiento de pesas',
   },
+  auth: {
+    invalidCredentials: 'Correo o contraseña incorrectos.',
+    emailNotConfirmed: 'Confirma tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.',
+    emailInUse: 'Ya existe una cuenta con este correo.',
+    weakPassword: 'Elige una contraseña de al menos 8 caracteres.',
+    rateLimited: 'Demasiados intentos. Espera un momento y vuelve a intentarlo.',
+    generic: 'Algo salió mal. Inténtalo de nuevo.',
+    checkEmail: 'Casi listo: enviamos un enlace de confirmación a {email}.',
+    resetSent: 'Si ese correo tiene una cuenta, el enlace para restablecer ya está en camino.',
+    consentRequired: 'Acepta los términos para crear tu cuenta.',
+    consentLabel: 'Acepto los {terms} y la {privacy}, incluido el tratamiento de mis datos de salud.',
+  },
   login: {
     liveOverview: 'Resumen de salud en vivo',
     heartRate: 'Frecuencia cardíaca',
@@ -56,6 +68,13 @@ const es: Messages = {
     submitting: 'Iniciando sesión...',
     newHere: '¿Eres nuevo en HealthAI?',
     createAccount: 'Crear cuenta',
+  },
+  forgot: {
+    title: 'Restablecer tu contraseña',
+    subtitle: 'Escribe tu correo y te enviaremos un enlace para restablecerla.',
+    submit: 'Enviar enlace',
+    sending: 'Enviando...',
+    back: 'Volver a iniciar sesión',
   },
   signup: {
     whatYouGet: 'Lo que obtienes con HealthAI',
