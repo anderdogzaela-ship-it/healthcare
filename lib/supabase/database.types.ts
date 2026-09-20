@@ -12,6 +12,11 @@ export type MeasurementMetric = 'heart_rate' | 'blood_pressure' | 'weight';
 export type GoalMetric = 'steps' | 'sleep_hours' | 'water_glasses';
 export type DataSource = 'manual' | 'fitbit' | 'apple_health' | 'health_connect';
 export type MessageRole = 'user' | 'ai';
+export type AppointmentStatus = 'scheduled' | 'confirmed' | 'cancelled' | 'completed' | 'no_show';
+export type ReminderKind = '24h' | '2h' | 'follow_up';
+export type ReminderStatus = 'pending' | 'sent' | 'failed' | 'skipped';
+export type AutomationChannel = 'whatsapp' | 'email' | 'sms';
+export type AutomationDirection = 'outbound' | 'inbound';
 
 export interface Database {
   public: {
@@ -25,6 +30,8 @@ export interface Database {
           locale: AppLocale;
           timezone: string;
           plan: string;
+          phone: string | null;
+          phone_verified: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -36,6 +43,7 @@ export interface Database {
           locale?: AppLocale;
           timezone?: string;
           plan?: string;
+          phone?: string | null;
         };
         Update: {
           full_name?: string;
@@ -44,6 +52,8 @@ export interface Database {
           locale?: AppLocale;
           timezone?: string;
           plan?: string;
+          phone?: string | null;
+          phone_verified?: boolean;
         };
         Relationships: [];
       };
@@ -263,6 +273,95 @@ export interface Database {
         Update: { content?: string };
         Relationships: [];
       };
+      appointments: {
+        Row: {
+          id: string;
+          user_id: string;
+          starts_at: string;
+          duration_min: number;
+          professional: string;
+          location: string | null;
+          reason: string | null;
+          status: AppointmentStatus;
+          confirmed_at: string | null;
+          cancelled_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          starts_at: string;
+          duration_min?: number;
+          professional?: string;
+          location?: string | null;
+          reason?: string | null;
+          status?: AppointmentStatus;
+        };
+        Update: {
+          starts_at?: string;
+          duration_min?: number;
+          professional?: string;
+          location?: string | null;
+          reason?: string | null;
+          status?: AppointmentStatus;
+          confirmed_at?: string | null;
+          cancelled_at?: string | null;
+        };
+        Relationships: [];
+      };
+      reminder_jobs: {
+        Row: {
+          id: string;
+          appointment_id: string;
+          user_id: string;
+          kind: ReminderKind;
+          channel: AutomationChannel;
+          send_at: string;
+          status: ReminderStatus;
+          attempts: number;
+          sent_at: string | null;
+          error: string | null;
+          created_at: string;
+        };
+        Insert: {
+          appointment_id: string;
+          user_id: string;
+          kind: ReminderKind;
+          channel?: AutomationChannel;
+          send_at: string;
+          status?: ReminderStatus;
+        };
+        Update: {
+          send_at?: string;
+          status?: ReminderStatus;
+          attempts?: number;
+          sent_at?: string | null;
+          error?: string | null;
+        };
+        Relationships: [];
+      };
+      automation_events: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          appointment_id: string | null;
+          direction: AutomationDirection;
+          channel: AutomationChannel;
+          event_type: string;
+          payload: Record<string, unknown>;
+          created_at: string;
+        };
+        Insert: {
+          user_id?: string | null;
+          appointment_id?: string | null;
+          direction: AutomationDirection;
+          channel?: AutomationChannel;
+          event_type: string;
+          payload?: Record<string, unknown>;
+        };
+        Update: { payload?: Record<string, unknown> };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -273,6 +372,11 @@ export interface Database {
       goal_metric: GoalMetric;
       data_source: DataSource;
       message_role: MessageRole;
+      appointment_status: AppointmentStatus;
+      reminder_kind: ReminderKind;
+      reminder_status: ReminderStatus;
+      automation_channel: AutomationChannel;
+      automation_direction: AutomationDirection;
     };
     CompositeTypes: Record<string, never>;
   };
