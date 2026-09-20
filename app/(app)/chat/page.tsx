@@ -41,5 +41,14 @@ export default async function ChatPage({
     }));
   }
 
-  return <ChatView conversations={conversations} activeId={activeId} initialMessages={initialMessages} />;
+  // Keyed by conversation so switching threads remounts the view: without it
+  // the chat would keep the previous conversation's messages in state.
+  return (
+    <ChatView
+      key={activeId ?? 'new'}
+      conversations={conversations}
+      activeId={activeId}
+      initialMessages={initialMessages}
+    />
+  );
 }

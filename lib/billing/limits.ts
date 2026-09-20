@@ -26,9 +26,12 @@ export async function getClinicUsage(clinicId: string): Promise<ClinicUsage> {
       .maybeSingle(),
     supabase.from('patients').select('id', { count: 'exact', head: true }).eq('clinic_id', clinicId).neq('status', 'archived'),
     supabase.from('clinic_members').select('user_id', { count: 'exact', head: true }).eq('clinic_id', clinicId),
+    // Scoped to this clinic's appointments; without the join it would also
+    // count the staff member's own personal reminders.
     supabase
       .from('reminder_jobs')
-      .select('id', { count: 'exact', head: true })
+      .select('id, appointments!inner(clinic_id)', { count: 'exact', head: true })
+      .eq('appointments.clinic_id', clinicId)
       .eq('status', 'sent')
       .gte('sent_at', monthStart.toISOString()),
   ]);

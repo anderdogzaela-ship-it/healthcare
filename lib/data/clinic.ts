@@ -64,7 +64,10 @@ export async function getPatients(clinicId: string, search?: string): Promise<Pa
     .limit(200);
 
   if (search && search.trim()) {
-    const term = `%${search.trim()}%`;
+    // Commas and parentheses are separators in PostgREST's `or` syntax, so a
+    // name like "Souza, Ana" would otherwise break the filter.
+    const safe = search.trim().replace(/[,()*]/g, ' ').slice(0, 80);
+    const term = `%${safe}%`;
     query = query.or(`full_name.ilike.${term},email.ilike.${term},phone.ilike.${term}`);
   }
 

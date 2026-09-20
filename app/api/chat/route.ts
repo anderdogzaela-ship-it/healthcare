@@ -45,20 +45,28 @@ export async function POST(request: Request) {
   }
 
   // Find or create the conversation. RLS guarantees the id belongs to this user.
-  let conversationId = requestedConversation;
-  if (conversationId) {
-    const { data } = await supabase.from('conversations').select('id').eq('id', conversationId).single();
-    if (!data) conversationId = null;
+  let existingId: string | null = null;
+  if (requestedConversation) {
+    const { data } = await supabase
+      .from('conversations')
+      .select('id')
+      .eq('id', requestedConversation)
+      .maybeSingle();
+    existingId = data?.id ?? null;
   }
-  if (!conversationId) {
+
+  if (!existingId) {
     const { data, error } = await supabase
       .from('conversations')
       .insert({ user_id: user.id, title: userMessage.slice(0, 60) })
       .select('id')
       .single();
     if (error || !data) return Response.json({ error: 'failed' }, { status: 500 });
-    conversationId = data.id;
+    existingId = data.id;
   }
+
+  // Non-null from here on, which the header and the inserts below rely on.
+  const conversationId: string = existingId;
 
   await supabase.from('messages').insert({
     conversation_id: conversationId,

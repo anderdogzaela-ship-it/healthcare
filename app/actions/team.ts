@@ -146,6 +146,8 @@ export async function acceptInvitation(token: string): Promise<AcceptResult> {
     .update({ accepted_at: new Date().toISOString(), accepted_by: user.id })
     .eq('id', invitation.id);
 
-  revalidatePath('/clinic');
+  // No revalidatePath here: this runs while the invite page renders, and
+  // revalidating during render is not allowed. Clinic pages read cookies, so
+  // they are dynamic and will show the new membership anyway.
   return 'accepted';
 }
