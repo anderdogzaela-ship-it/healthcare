@@ -139,10 +139,11 @@ export default function SignUpPage() {
 
               {/* Full name */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.fullName}</label>
+                <label htmlFor="signup-name" className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.fullName}</label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
+                    id="signup-name"
                     type="text"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -155,10 +156,11 @@ export default function SignUpPage() {
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.email}</label>
+                <label htmlFor="signup-email" className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.email}</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
+                    id="signup-email"
                     type="email"
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -171,10 +173,11 @@ export default function SignUpPage() {
 
               {/* Password */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.password}</label>
+                <label htmlFor="signup-password" className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.password}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
+                    id="signup-password"
                     type={showPassword ? 'text' : 'password'}
                     value={form.password}
                     onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -196,10 +199,11 @@ export default function SignUpPage() {
 
               {/* Confirm password */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.confirmPassword}</label>
+                <label htmlFor="signup-confirm" className="block text-sm font-semibold text-gray-700 mb-2">{m.signup.confirmPassword}</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
+                    id="signup-confirm"
                     type={showConfirm ? 'text' : 'password'}
                     value={form.confirm}
                     onChange={(e) => { setForm({ ...form, confirm: e.target.value }); setError(''); }}

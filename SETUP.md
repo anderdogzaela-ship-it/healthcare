@@ -82,7 +82,25 @@ In the Supabase dashboard, under **Authentication**:
 npm run dev        # http://localhost:3000
 npm run typecheck  # TypeScript, no build
 npm run build      # production build
+npm run test:e2e   # Playwright (starts its own dev server on port 3100)
 ```
+
+## Tests
+
+`tests/e2e/` holds two Playwright suites:
+
+- **`public.spec.ts`** needs no database. It covers the landing page, the
+  pricing toggle and FAQ, the three languages, the redirect on every protected
+  route, and the API answering 401 without credentials. Run it anywhere:
+  `npx playwright install chromium && npm run test:e2e`.
+- **`account.spec.ts`** runs the real flow — sign up, log health data, see it
+  on the dashboard, save settings, create a clinic and add a patient. It skips
+  itself unless `NEXT_PUBLIC_SUPABASE_URL` points at a real project, and it
+  needs email confirmation switched off in Supabase, otherwise sign-up stops at
+  "check your inbox".
+
+The suite runs with a single worker: parallel workers crash the headless shell
+on Windows.
 
 ## Deploying to Vercel
 

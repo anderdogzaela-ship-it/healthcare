@@ -49,7 +49,17 @@ export const UNAUTHORIZED = () =>
  * is one line: `if (caller instanceof Response) return caller;`
  */
 export async function authenticateAndLimit(request: Request): Promise<ApiCaller | Response> {
-  const caller = await authenticateRequest(request);
+  let caller: ApiCaller | null;
+  try {
+    caller = await authenticateRequest(request);
+  } catch (error) {
+    // A missing service role key or an unreachable database is a server
+    // problem; answering 401 here would send integrators hunting for a bad
+    // key that is actually fine.
+    console.error('api authentication failed', error);
+    return Response.json({ error: 'not_configured' }, { status: 503 });
+  }
+
   if (!caller) return UNAUTHORIZED();
   if (!(await consumeRateLimit(caller.keyId))) return rateLimited();
   return caller;
