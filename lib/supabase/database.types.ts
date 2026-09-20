@@ -299,6 +299,34 @@ export interface Database {
         Update: { role?: ClinicRole };
         Relationships: [];
       };
+      clinic_invitations: {
+        Row: {
+          id: string;
+          clinic_id: string;
+          email: string;
+          role: ClinicRole;
+          token_hash: string;
+          invited_by: string | null;
+          expires_at: string;
+          accepted_at: string | null;
+          accepted_by: string | null;
+          revoked_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          clinic_id: string;
+          email: string;
+          token_hash: string;
+          role?: ClinicRole;
+          invited_by?: string | null;
+        };
+        Update: {
+          accepted_at?: string | null;
+          accepted_by?: string | null;
+          revoked_at?: string | null;
+        };
+        Relationships: [];
+      };
       patients: {
         Row: {
           id: string;

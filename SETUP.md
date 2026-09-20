@@ -124,7 +124,9 @@ supabase/migrations/    SQL schema
   bot that confirms, cancels or flags a reschedule from the patient's reply
 - Clinics with staff roles, a patient CRM (pipeline, notes, bookings) and
   per-clinic data isolation enforced in the database
-- Subscriptions with plan limits that are actually enforced
+- Team management: invite colleagues with a single-use link, assign roles,
+  remove members
+- Subscriptions with plan limits that are actually enforced, including seats
 - A public API with per-clinic keys and signed webhooks, documented in
   [automations/api/](automations/api/)
 - Full interface in English, Spanish and Portuguese
@@ -171,9 +173,9 @@ refused with an upgrade prompt.
 ## Not built yet
 
 - **Device sync**: Apple Health, Fitbit and Google Fit are shown as disabled.
-- **Staff invitations**: a clinic owner cannot yet invite colleagues by email.
-- **Webhook retries**: a failed delivery is logged, not retried.
-- **Update and delete** through the public API; only create and read exist.
+- **Sending invitation emails**: the invitation link is generated and shown to
+  the owner to share; no email is sent yet.
+- **Per-scope API permissions**: a key can do everything its clinic can.
 - Data export and account deletion.
 
 ## Working with health data

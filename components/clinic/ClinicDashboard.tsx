@@ -90,6 +90,9 @@ export default function ClinicDashboard({
             <Link href="/clinic/billing" className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
               {m.clinic.billingLink} →
             </Link>
+            <Link href="/clinic/team" className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
+              {m.clinic.teamLink} →
+            </Link>
             <Link href="/clinic/integrations" className="text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors">
               {m.clinic.integrationsLink} →
             </Link>
