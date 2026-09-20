@@ -27,7 +27,12 @@ cp .env.example .env.local
    NEXT_PUBLIC_SUPABASE_URL=https://<your-ref>.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key>
    NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   ANTHROPIC_API_KEY=sk-ant-...
    ```
+
+   `ANTHROPIC_API_KEY` (from [console.anthropic.com](https://console.anthropic.com))
+   powers the AI assistant and is read only on the server. It must never be
+   given a `NEXT_PUBLIC_` prefix, which would ship it to the browser.
 
    The anon key is safe in the browser: every table is protected by row level
    security, so it only ever returns the signed-in user's own rows. Never put
@@ -105,12 +110,32 @@ supabase/migrations/    SQL schema
 - Health log saved per day, with validation of physiological ranges
 - Dashboard and activity pages built from the signed-in user's own data
 - Settings, preferences and goals persisted
+- AI assistant answering from the user's own logged data
 - Full interface in English, Spanish and Portuguese
+
+## The AI assistant
+
+`app/api/chat/route.ts` streams answers from Claude (`claude-opus-5`). It does
+not receive a dump of the user's records: it calls read-only tools
+(`get_measurements`, `get_sleep`, `get_activity`, `get_goals`) that query
+Supabase server-side, scoped to the signed-in user, so the model cannot widen
+the search. Conversations and messages are stored per user.
+
+Three safeguards:
+
+- **Emergency escalation.** Messages mentioning possible emergencies (chest
+  pain, stroke signs, self-harm, in any of the three languages) never reach the
+  model; the user is told to seek urgent care.
+- **Clinical limits in the system prompt.** No diagnosis, no medication advice,
+  no reassurance about symptoms, and abnormal readings are never softened.
+- **Rate limit.** 40 messages per user per hour, checked before any spend.
+
+Server-side fallbacks are enabled, so if the model declines a request it is
+retried on a fallback model instead of failing. Cost scales with use: each
+answer is one or more Claude calls, so watch usage in the Anthropic console.
 
 ## Not built yet
 
-- **AI assistant**: the chat screen still replies from a fixed list of demo
-  answers. It needs an LLM API key and a tool-grounded endpoint.
 - **Device sync**: Apple Health, Fitbit and Google Fit are shown as disabled.
 - **WhatsApp, CRM and automations** described on the landing page.
 - Data export and account deletion.
