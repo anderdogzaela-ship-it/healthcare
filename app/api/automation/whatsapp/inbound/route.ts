@@ -19,10 +19,9 @@ function normalizePhone(raw: string): string {
 /**
  * Inbound WhatsApp message.
  *
- * The WhatsApp provider posts here (through n8n), the route decides what the
- * message means, updates the appointment, and returns the reply for the
- * provider to send back. Keeping the decision here rather than in the workflow
- * means the rules are versioned with the app.
+ * The provider posts here (through n8n); this route decides what the message
+ * means, updates the appointment, and returns the reply to send back. The
+ * number can belong either to an app user or to a clinic's patient.
  */
 export async function POST(request: Request) {
   if (!isAuthorizedAutomation(request)) return unauthorized();
@@ -39,27 +38,44 @@ export async function POST(request: Request) {
     .eq('phone', phone)
     .maybeSingle();
 
-  // Unknown number: log nothing personal, and let the workflow decide what to
-  // answer. Never reveal whether a number belongs to an account.
-  if (!profile) {
-    return Response.json({ matched: false, reply: null });
+  let sender: { locale: string; userId?: string; patientId?: string } | null = profile
+    ? { locale: profile.locale, userId: profile.id }
+    : null;
+
+  if (!sender) {
+    const { data: patients } = await admin
+      .from('patients')
+      .select('id, locale')
+      .eq('phone', phone)
+      .limit(1);
+
+    const patient = patients?.[0];
+    if (patient) sender = { locale: patient.locale, patientId: patient.id };
   }
 
-  const locale = isLocale(profile.locale) ? profile.locale : 'en';
+  // Unknown number: never reveal whether it belongs to an account.
+  if (!sender) return Response.json({ matched: false, reply: null });
+
+  const locale = isLocale(sender.locale) ? sender.locale : 'en';
   const intent = detectIntent(parsed.data.text);
 
-  const { data: appointment } = await admin
+  const query = admin
     .from('appointments')
     .select('id, starts_at, status')
-    .eq('user_id', profile.id)
     .in('status', ['scheduled', 'confirmed'])
     .gt('starts_at', new Date().toISOString())
     .order('starts_at', { ascending: true })
-    .limit(1)
-    .maybeSingle();
+    .limit(1);
+
+  const { data: appointments } = sender.userId
+    ? await query.eq('user_id', sender.userId)
+    : await query.eq('patient_id', sender.patientId!);
+
+  const appointment = appointments?.[0];
 
   await admin.from('automation_events').insert({
-    user_id: profile.id,
+    user_id: sender.userId ?? null,
+    patient_id: sender.patientId ?? null,
     appointment_id: appointment?.id ?? null,
     direction: 'inbound',
     channel: 'whatsapp',

@@ -17,6 +17,8 @@ export type ReminderKind = '24h' | '2h' | 'follow_up';
 export type ReminderStatus = 'pending' | 'sent' | 'failed' | 'skipped';
 export type AutomationChannel = 'whatsapp' | 'email' | 'sms';
 export type AutomationDirection = 'outbound' | 'inbound';
+export type ClinicRole = 'owner' | 'professional' | 'receptionist';
+export type PatientStatus = 'lead' | 'active' | 'inactive' | 'archived';
 
 export interface Database {
   public: {
@@ -273,10 +275,85 @@ export interface Database {
         Update: { content?: string };
         Relationships: [];
       };
+      clinics: {
+        Row: {
+          id: string;
+          name: string;
+          timezone: string;
+          locale: AppLocale;
+          plan: string;
+          created_by: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: { name: string; timezone?: string; locale?: AppLocale; created_by: string };
+        Update: { name?: string; timezone?: string; locale?: AppLocale; plan?: string };
+        Relationships: [];
+      };
+      clinic_members: {
+        Row: { clinic_id: string; user_id: string; role: ClinicRole; created_at: string };
+        Insert: { clinic_id: string; user_id: string; role?: ClinicRole };
+        Update: { role?: ClinicRole };
+        Relationships: [];
+      };
+      patients: {
+        Row: {
+          id: string;
+          clinic_id: string;
+          user_id: string | null;
+          full_name: string;
+          email: string | null;
+          phone: string | null;
+          date_of_birth: string | null;
+          locale: AppLocale;
+          status: PatientStatus;
+          notes: string | null;
+          last_visit_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          clinic_id: string;
+          full_name: string;
+          user_id?: string | null;
+          email?: string | null;
+          phone?: string | null;
+          date_of_birth?: string | null;
+          locale?: AppLocale;
+          status?: PatientStatus;
+          notes?: string | null;
+        };
+        Update: {
+          full_name?: string;
+          email?: string | null;
+          phone?: string | null;
+          date_of_birth?: string | null;
+          locale?: AppLocale;
+          status?: PatientStatus;
+          notes?: string | null;
+          last_visit_at?: string | null;
+        };
+        Relationships: [];
+      };
+      patient_notes: {
+        Row: {
+          id: string;
+          clinic_id: string;
+          patient_id: string;
+          author_id: string | null;
+          body: string;
+          created_at: string;
+        };
+        Insert: { clinic_id: string; patient_id: string; author_id?: string | null; body: string };
+        Update: { body?: string };
+        Relationships: [];
+      };
       appointments: {
         Row: {
           id: string;
-          user_id: string;
+          user_id: string | null;
+          clinic_id: string | null;
+          patient_id: string | null;
           starts_at: string;
           duration_min: number;
           professional: string;
@@ -289,7 +366,9 @@ export interface Database {
           updated_at: string;
         };
         Insert: {
-          user_id: string;
+          user_id?: string | null;
+          clinic_id?: string | null;
+          patient_id?: string | null;
           starts_at: string;
           duration_min?: number;
           professional?: string;
@@ -313,7 +392,8 @@ export interface Database {
         Row: {
           id: string;
           appointment_id: string;
-          user_id: string;
+          user_id: string | null;
+          patient_id: string | null;
           kind: ReminderKind;
           channel: AutomationChannel;
           send_at: string;
@@ -325,7 +405,8 @@ export interface Database {
         };
         Insert: {
           appointment_id: string;
-          user_id: string;
+          user_id?: string | null;
+          patient_id?: string | null;
           kind: ReminderKind;
           channel?: AutomationChannel;
           send_at: string;
@@ -345,6 +426,7 @@ export interface Database {
           id: string;
           user_id: string | null;
           appointment_id: string | null;
+          patient_id: string | null;
           direction: AutomationDirection;
           channel: AutomationChannel;
           event_type: string;
@@ -354,6 +436,7 @@ export interface Database {
         Insert: {
           user_id?: string | null;
           appointment_id?: string | null;
+          patient_id?: string | null;
           direction: AutomationDirection;
           channel?: AutomationChannel;
           event_type: string;
@@ -377,6 +460,8 @@ export interface Database {
       reminder_status: ReminderStatus;
       automation_channel: AutomationChannel;
       automation_direction: AutomationDirection;
+      clinic_role: ClinicRole;
+      patient_status: PatientStatus;
     };
     CompositeTypes: Record<string, never>;
   };
