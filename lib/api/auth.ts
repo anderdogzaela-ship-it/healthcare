@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { hashApiKey, readApiKey } from './keys';
+import { consumeRateLimit, rateLimited } from './rate-limit';
 
 export interface ApiCaller {
   clinicId: string;
@@ -40,3 +41,16 @@ export const UNAUTHORIZED = () =>
     { error: 'unauthorized', detail: 'Send your key as `Authorization: Bearer <key>`.' },
     { status: 401, headers: { 'WWW-Authenticate': 'Bearer' } }
   );
+
+/**
+ * Authenticate and count the request against the key's quota.
+ *
+ * Returns either the caller or the Response to send back, so a route handler
+ * is one line: `if (caller instanceof Response) return caller;`
+ */
+export async function authenticateAndLimit(request: Request): Promise<ApiCaller | Response> {
+  const caller = await authenticateRequest(request);
+  if (!caller) return UNAUTHORIZED();
+  if (!(await consumeRateLimit(caller.keyId))) return rateLimited();
+  return caller;
+}

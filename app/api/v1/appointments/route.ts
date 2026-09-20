@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { apiError, authenticateRequest, UNAUTHORIZED } from '@/lib/api/auth';
+import { apiError, authenticateAndLimit } from '@/lib/api/auth';
 import { dispatchWebhook } from '@/lib/api/webhooks';
 
 export const runtime = 'nodejs';
@@ -21,8 +21,8 @@ const createSchema = z.object({
 
 /** GET /api/v1/appointments — appointments in a date range. */
 export async function GET(request: Request) {
-  const caller = await authenticateRequest(request);
-  if (!caller) return UNAUTHORIZED();
+  const caller = await authenticateAndLimit(request);
+  if (caller instanceof Response) return caller;
 
   const { searchParams } = new URL(request.url);
   const from = searchParams.get('from');
@@ -48,8 +48,8 @@ export async function GET(request: Request) {
 
 /** POST /api/v1/appointments — book an appointment and queue its reminders. */
 export async function POST(request: Request) {
-  const caller = await authenticateRequest(request);
-  if (!caller) return UNAUTHORIZED();
+  const caller = await authenticateAndLimit(request);
+  if (caller instanceof Response) return caller;
 
   const parsed = createSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { apiError, authenticateRequest, UNAUTHORIZED } from '@/lib/api/auth';
+import { apiError, authenticateAndLimit } from '@/lib/api/auth';
 import { dispatchWebhook } from '@/lib/api/webhooks';
 
 export const runtime = 'nodejs';
@@ -21,8 +21,8 @@ function normalizePhone(value?: string): string | null {
 
 /** GET /api/v1/patients — the clinic's patients, newest first. */
 export async function GET(request: Request) {
-  const caller = await authenticateRequest(request);
-  if (!caller) return UNAUTHORIZED();
+  const caller = await authenticateAndLimit(request);
+  if (caller instanceof Response) return caller;
 
   const { searchParams } = new URL(request.url);
   const limit = Math.min(Number(searchParams.get('limit')) || 50, 200);
@@ -47,8 +47,8 @@ export async function GET(request: Request) {
 
 /** POST /api/v1/patients — create a patient. */
 export async function POST(request: Request) {
-  const caller = await authenticateRequest(request);
-  if (!caller) return UNAUTHORIZED();
+  const caller = await authenticateAndLimit(request);
+  if (caller instanceof Response) return caller;
 
   const parsed = createSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {

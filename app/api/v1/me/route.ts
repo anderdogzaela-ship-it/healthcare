@@ -1,5 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin';
-import { authenticateRequest, UNAUTHORIZED } from '@/lib/api/auth';
+import { authenticateAndLimit } from '@/lib/api/auth';
 
 export const runtime = 'nodejs';
 
@@ -8,8 +8,8 @@ export const runtime = 'nodejs';
  * The endpoint integrations call first to check a key works.
  */
 export async function GET(request: Request) {
-  const caller = await authenticateRequest(request);
-  if (!caller) return UNAUTHORIZED();
+  const caller = await authenticateAndLimit(request);
+  if (caller instanceof Response) return caller;
 
   const admin = createAdminClient();
   const { data: clinic } = await admin

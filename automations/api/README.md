@@ -61,8 +61,19 @@ const ok = crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(v1))
   && Math.abs(Date.now() / 1000 - Number(t)) < 300;
 ```
 
-Deliveries are attempted once and the result is logged on the integrations
-page; there is no automatic retry yet.
+### Retries
+
+A failed delivery is retried up to five times with growing gaps (1, 4, 9 and
+16 minutes) by a scheduled job. On Vercel this runs from `vercel.json` every
+ten minutes; anywhere else, call it yourself:
+
+```bash
+curl -H "x-api-key: $AUTOMATION_API_KEY" "$BASE/api/cron/webhook-retries"
+```
+
+Your endpoint should answer 2xx quickly and do the real work afterwards, and
+must tolerate the same event arriving twice — a retry after a timeout cannot
+know whether the first attempt was processed.
 
 ## Zapier
 
@@ -84,9 +95,30 @@ There is no published Zapier app, so use the built-in generic steps:
 - Parse the signature with the *Crypto* module if you want verification inside
   the scenario rather than trusting the URL's secrecy.
 
+## Rate limit
+
+120 requests per minute per key. Over the limit the API answers `429` with a
+`Retry-After` header.
+
+## Updating and removing
+
+```bash
+# Change a patient's status
+curl -X PATCH -H "Authorization: Bearer $KEY" -H "content-type: application/json" \
+  -d '{"status":"active"}' "$BASE/api/v1/patients/<id>"
+
+# Move an appointment: reminders are re-queued for the new time
+curl -X PATCH -H "Authorization: Bearer $KEY" -H "content-type: application/json" \
+  -d '{"starts_at":"2026-09-26T09:00:00-03:00"}' "$BASE/api/v1/appointments/<id>"
+
+# Cancel it: pending reminders stop and a webhook fires
+curl -X DELETE -H "Authorization: Bearer $KEY" "$BASE/api/v1/appointments/<id>"
+```
+
+`DELETE /patients/{id}` archives by default, keeping history; add `?hard=true`
+to delete the record outright, which is what an erasure request needs.
+
 ## Limits
 
 - No pagination cursors: `limit` and `offset` only.
-- No rate limiting on the public API yet, so keep keys private.
-- Updating or deleting patients and appointments is not exposed yet; only
-  create and read.
+- Keys are all-or-nothing: there are no per-scope permissions yet.

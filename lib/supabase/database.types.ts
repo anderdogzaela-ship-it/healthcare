@@ -383,15 +383,27 @@ export interface Database {
           status: WebhookStatus;
           response_code: number | null;
           error: string | null;
+          payload: Record<string, unknown>;
+          attempts: number;
+          next_attempt_at: string | null;
           created_at: string;
           delivered_at: string | null;
         };
-        Insert: { endpoint_id: string; clinic_id: string; event_type: string; status?: WebhookStatus };
+        Insert: {
+          endpoint_id: string;
+          clinic_id: string;
+          event_type: string;
+          status?: WebhookStatus;
+          payload?: Record<string, unknown>;
+          attempts?: number;
+        };
         Update: {
           status?: WebhookStatus;
           response_code?: number | null;
           error?: string | null;
           delivered_at?: string | null;
+          attempts?: number;
+          next_attempt_at?: string | null;
         };
         Relationships: [];
       };
@@ -538,7 +550,14 @@ export interface Database {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      consume_rate_limit: {
+        Args: { p_key_id: string; p_window_seconds: number; p_max: number };
+        Returns: boolean;
+      };
+      is_clinic_member: { Args: { target_clinic: string }; Returns: boolean };
+      clinic_role_of: { Args: { target_clinic: string }; Returns: ClinicRole };
+    };
     Enums: {
       unit_system: UnitSystem;
       app_locale: AppLocale;
