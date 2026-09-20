@@ -19,6 +19,8 @@ export type AutomationChannel = 'whatsapp' | 'email' | 'sms';
 export type AutomationDirection = 'outbound' | 'inbound';
 export type ClinicRole = 'owner' | 'professional' | 'receptionist';
 export type PatientStatus = 'lead' | 'active' | 'inactive' | 'archived';
+export type SubscriptionStatus =
+  | 'trialing' | 'active' | 'past_due' | 'canceled' | 'incomplete' | 'unpaid';
 
 export interface Database {
   public: {
@@ -335,6 +337,37 @@ export interface Database {
         };
         Relationships: [];
       };
+      subscriptions: {
+        Row: {
+          clinic_id: string;
+          stripe_customer_id: string | null;
+          stripe_subscription_id: string | null;
+          plan: string;
+          status: SubscriptionStatus;
+          current_period_end: string | null;
+          cancel_at_period_end: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          clinic_id: string;
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          plan?: string;
+          status?: SubscriptionStatus;
+          current_period_end?: string | null;
+          cancel_at_period_end?: boolean;
+        };
+        Update: {
+          stripe_customer_id?: string | null;
+          stripe_subscription_id?: string | null;
+          plan?: string;
+          status?: SubscriptionStatus;
+          current_period_end?: string | null;
+          cancel_at_period_end?: boolean;
+        };
+        Relationships: [];
+      };
       patient_notes: {
         Row: {
           id: string;
@@ -462,6 +495,7 @@ export interface Database {
       automation_direction: AutomationDirection;
       clinic_role: ClinicRole;
       patient_status: PatientStatus;
+      subscription_status: SubscriptionStatus;
     };
     CompositeTypes: Record<string, never>;
   };

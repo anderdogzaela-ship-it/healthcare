@@ -7,7 +7,8 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Everything except static assets and image files.
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // Everything except static assets, image files, and the machine-to-machine
+    // endpoints, which authenticate themselves and have no session to refresh.
+    '/((?!_next/static|_next/image|favicon.ico|api/stripe|api/automation|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
