@@ -270,6 +270,213 @@ const en = {
     connect: 'Connect',
     disconnect: 'Disconnect',
   },
+  landing: {
+    nav: {
+      features: 'Features',
+      how: 'How it works',
+      pricing: 'Pricing',
+      faq: 'FAQ',
+      signIn: 'Sign in',
+      getStarted: 'Get started',
+    },
+    demoBadge: 'Demo · synthetic data',
+    hero: {
+      badge: 'New: WhatsApp automation',
+      titleStart: 'Run your clinic on',
+      titleAccent: 'autopilot',
+      subtitle:
+        'HealthAI brings patient records, AI insights and WhatsApp automation into one platform, so your team spends less time chasing reminders and more time on care.',
+      ctaPrimary: 'Create free account',
+      ctaSecondary: 'See how it works',
+      note: 'No credit card required · 14-day trial',
+      cardHeartRate: 'Heart rate',
+      cardAdherence: 'Appointment adherence',
+      cardReminder: 'Reminder sent on WhatsApp',
+    },
+    stats: {
+      noShows: 'fewer no-shows',
+      hours: 'hours saved monthly',
+      clinics: 'clinics onboard',
+      uptime: 'uptime',
+    },
+    trust: 'Built for clinics, wellness teams and independent practitioners',
+    features: {
+      title: 'Everything your clinic needs, in one place',
+      subtitle: 'From the first message to follow-up care, without switching between five tools.',
+      items: {
+        tracking: {
+          title: 'Patient health records',
+          description: 'Vitals, sleep, activity and symptoms in a single timeline, logged by your team or synced from devices.',
+        },
+        assistant: {
+          title: 'AI health assistant',
+          description: 'Answers grounded in each patient’s own data, with clinical guardrails and escalation when something looks urgent.',
+        },
+        whatsapp: {
+          title: 'WhatsApp bot',
+          description: 'Patients confirm, reschedule or cancel in the app they already use. No downloads, no passwords.',
+        },
+        automation: {
+          title: 'Automated workflows',
+          description: 'Reminders, follow-ups and no-show recovery run on schedule, so nobody has to remember them.',
+        },
+        crm: {
+          title: 'Clinic CRM',
+          description: 'Pipelines, notes and a full interaction timeline for every patient, with dashboards your team can act on.',
+        },
+        integrations: {
+          title: 'Open integrations',
+          description: 'REST API, webhooks and ready-made Zapier, Make and n8n templates connect HealthAI to your stack.',
+        },
+      },
+    },
+    how: {
+      title: 'Up and running in an afternoon',
+      subtitle: 'No migration project, no consultants.',
+      steps: {
+        one: {
+          title: 'Create your workspace',
+          description: 'Sign up, invite your team and choose a plan. Roles keep each person to exactly what they need.',
+        },
+        two: {
+          title: 'Connect your channels',
+          description: 'Link WhatsApp, your calendar and lab integrations in a few clicks, then switch on the automations you want.',
+        },
+        three: {
+          title: 'Let it run',
+          description: 'Reminders go out, replies update records automatically, and your dashboard shows what changed.',
+        },
+      },
+    },
+    platform: {
+      title: 'A workspace your team will actually use',
+      subtitle: 'Designed with the people who use it all day: receptionists, nurses and practitioners.',
+      bullets: [
+        'Dashboards that surface what changed since yesterday',
+        'Health logs with instant AI analysis',
+        'Multi-clinic support with strict data isolation',
+        'English, Spanish and Portuguese out of the box',
+      ],
+    },
+    whatsapp: {
+      title: 'Your patients already live on WhatsApp',
+      description:
+        'Reminders, confirmations and intake questionnaires happen in a conversation, and every reply lands in the patient record automatically.',
+      bullets: [
+        'Reminders 24 hours and 2 hours before the visit',
+        'One-tap confirm, reschedule or cancel',
+        'Symptom intake before the consultation',
+      ],
+      chat: {
+        one: 'Hi Ana! Your appointment with Dr. Lima is tomorrow at 2:00 PM. Can you make it?',
+        two: 'Yes, confirmed!',
+        three: 'Perfect. Want to answer 3 quick questions before your visit?',
+        four: 'Sure',
+      },
+    },
+    testimonials: {
+      title: 'Teams that got their time back',
+      subtitle: 'Illustrative quotes from a demo environment.',
+      items: {
+        a: {
+          quote: 'No-shows dropped by a third in the first month. The reminders simply run on their own.',
+          name: 'Dra. Ana Ribeiro',
+          role: 'Clínica Vida, São Paulo',
+        },
+        b: {
+          quote: 'Our receptionists stopped copying data between systems. That alone paid for the subscription.',
+          name: 'Miguel Torres',
+          role: 'Centro Médico Norte, Madrid',
+        },
+        c: {
+          quote: 'The assistant answers what patients ask at midnight, using our own data, safely.',
+          name: 'Sarah Johnson',
+          role: 'Lakeside Wellness, Austin',
+        },
+      },
+    },
+    pricing: {
+      title: 'Pricing that scales with you',
+      subtitle: 'Start free for 14 days. Change or cancel whenever you like.',
+      monthly: 'Monthly',
+      yearly: 'Yearly',
+      save: 'Save 20%',
+      popular: 'Most popular',
+      perMonth: '/month',
+      perMonthYearly: '/month, billed yearly',
+      custom: 'Custom',
+      plans: {
+        starter: {
+          name: 'Starter',
+          description: 'For independent practitioners',
+          features: ['Up to 100 patients', 'Health records and AI analysis', 'Email reminders', '1 team member', 'Community support'],
+          cta: 'Start free trial',
+        },
+        clinic: {
+          name: 'Clinic',
+          description: 'For growing clinics',
+          features: ['Up to 1,000 patients', 'WhatsApp bot and automations', 'CRM and dashboards', '10 team members', 'Priority support'],
+          cta: 'Start free trial',
+        },
+        enterprise: {
+          name: 'Enterprise',
+          description: 'For groups and networks',
+          features: ['Unlimited patients', 'Multi-clinic data isolation', 'API, webhooks and SSO', 'Dedicated onboarding', 'SLA and compliance review'],
+          cta: 'Talk to sales',
+        },
+      },
+    },
+    faq: {
+      title: 'Questions, answered',
+      items: {
+        security: {
+          question: 'Is patient data secure?',
+          answer: 'Each clinic’s data is isolated at the database level with row-level security, and encrypted in transit and at rest. This demo runs on synthetic data only.',
+        },
+        app: {
+          question: 'Do patients need to install an app?',
+          answer: 'No. Patients use WhatsApp for reminders and confirmations, and can optionally open a web portal for their full history.',
+        },
+        integrations: {
+          question: 'Can I connect my own tools?',
+          answer: 'Yes. There is a REST API, outbound webhooks, and ready-made Zapier, Make and n8n templates.',
+        },
+        languages: {
+          question: 'Which languages are supported?',
+          answer: 'The whole platform works in English, Spanish and Portuguese, including automated messages.',
+        },
+        cancel: {
+          question: 'Can I cancel at any time?',
+          answer: 'Yes. Plans are monthly with no lock-in, and you can export all of your data before you leave.',
+        },
+      },
+    },
+    cta: {
+      title: 'Ready to give your team its time back?',
+      subtitle: 'Create an account in under a minute and see your first automation run today.',
+      button: 'Create free account',
+      secondary: 'Sign in',
+    },
+    footer: {
+      product: 'Product',
+      company: 'Company',
+      legal: 'Legal',
+      links: {
+        features: 'Features',
+        pricing: 'Pricing',
+        integrations: 'Integrations',
+        api: 'API',
+        about: 'About',
+        blog: 'Blog',
+        contact: 'Contact',
+        privacy: 'Privacy',
+        terms: 'Terms',
+        security: 'Security',
+      },
+      rights: '© {year} HealthAI. Portfolio demo.',
+      demoNote: 'Demo project: all data, names and testimonials are fictitious.',
+    },
+  },
 };
 
 export type Messages = typeof en;

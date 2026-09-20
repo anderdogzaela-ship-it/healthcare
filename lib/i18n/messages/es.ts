@@ -281,6 +281,213 @@ const es: Messages = {
     connect: 'Conectar',
     disconnect: 'Desconectar',
   },
+  landing: {
+    nav: {
+      features: 'Funciones',
+      how: 'Cómo funciona',
+      pricing: 'Precios',
+      faq: 'Preguntas',
+      signIn: 'Iniciar sesión',
+      getStarted: 'Comenzar',
+    },
+    demoBadge: 'Demo · datos ficticios',
+    hero: {
+      badge: 'Nuevo: automatización por WhatsApp',
+      titleStart: 'Lleva tu clínica en',
+      titleAccent: 'piloto automático',
+      subtitle:
+        'HealthAI reúne las historias de tus pacientes, los análisis con IA y la automatización por WhatsApp en una sola plataforma, para que tu equipo dedique menos tiempo a recordatorios y más tiempo a cuidar.',
+      ctaPrimary: 'Crear cuenta gratis',
+      ctaSecondary: 'Ver cómo funciona',
+      note: 'Sin tarjeta de crédito · 14 días de prueba',
+      cardHeartRate: 'Frecuencia cardíaca',
+      cardAdherence: 'Asistencia a citas',
+      cardReminder: 'Recordatorio enviado por WhatsApp',
+    },
+    stats: {
+      noShows: 'menos ausencias',
+      hours: 'horas ahorradas al mes',
+      clinics: 'clínicas activas',
+      uptime: 'de disponibilidad',
+    },
+    trust: 'Creado para clínicas, equipos de bienestar y profesionales independientes',
+    features: {
+      title: 'Todo lo que tu clínica necesita, en un solo lugar',
+      subtitle: 'Desde el primer mensaje hasta el seguimiento, sin saltar entre cinco herramientas.',
+      items: {
+        tracking: {
+          title: 'Historias de salud',
+          description: 'Signos vitales, sueño, actividad y síntomas en una sola línea de tiempo, registrados por tu equipo o sincronizados desde dispositivos.',
+        },
+        assistant: {
+          title: 'Asistente de salud con IA',
+          description: 'Respuestas basadas en los datos de cada paciente, con límites clínicos y alertas cuando algo parece urgente.',
+        },
+        whatsapp: {
+          title: 'Bot de WhatsApp',
+          description: 'Los pacientes confirman, reprograman o cancelan desde la app que ya usan. Sin descargas ni contraseñas.',
+        },
+        automation: {
+          title: 'Flujos automatizados',
+          description: 'Recordatorios, seguimientos y recuperación de ausencias que se ejecutan solos, sin que nadie tenga que acordarse.',
+        },
+        crm: {
+          title: 'CRM para clínicas',
+          description: 'Embudos, notas y el historial completo de cada paciente, con paneles que tu equipo puede accionar.',
+        },
+        integrations: {
+          title: 'Integraciones abiertas',
+          description: 'API REST, webhooks y plantillas listas de Zapier, Make y n8n para conectar HealthAI con tus herramientas.',
+        },
+      },
+    },
+    how: {
+      title: 'Funcionando en una tarde',
+      subtitle: 'Sin proyecto de migración ni consultores.',
+      steps: {
+        one: {
+          title: 'Crea tu espacio',
+          description: 'Regístrate, invita a tu equipo y elige un plan. Los roles limitan a cada persona a lo que necesita.',
+        },
+        two: {
+          title: 'Conecta tus canales',
+          description: 'Vincula WhatsApp, tu calendario y los laboratorios en pocos clics, y activa las automatizaciones que quieras.',
+        },
+        three: {
+          title: 'Déjalo funcionar',
+          description: 'Los recordatorios salen solos, las respuestas actualizan las historias y tu panel muestra qué cambió.',
+        },
+      },
+    },
+    platform: {
+      title: 'Un espacio que tu equipo sí va a usar',
+      subtitle: 'Diseñado con quienes lo usan todo el día: recepción, enfermería y profesionales.',
+      bullets: [
+        'Paneles que muestran qué cambió desde ayer',
+        'Registros de salud con análisis instantáneo de IA',
+        'Varias clínicas con aislamiento estricto de datos',
+        'Español, portugués e inglés desde el primer día',
+      ],
+    },
+    whatsapp: {
+      title: 'Tus pacientes ya viven en WhatsApp',
+      description:
+        'Los recordatorios, las confirmaciones y los cuestionarios ocurren en una conversación, y cada respuesta llega sola a la historia del paciente.',
+      bullets: [
+        'Recordatorios 24 horas y 2 horas antes de la cita',
+        'Confirmar, reprogramar o cancelar con un toque',
+        'Registro de síntomas antes de la consulta',
+      ],
+      chat: {
+        one: '¡Hola, Ana! Tu cita con el Dr. Lima es mañana a las 14:00. ¿Puedes asistir?',
+        two: '¡Sí, confirmado!',
+        three: 'Perfecto. ¿Quieres responder 3 preguntas rápidas antes de la consulta?',
+        four: 'Claro',
+      },
+    },
+    testimonials: {
+      title: 'Equipos que recuperaron su tiempo',
+      subtitle: 'Testimonios ilustrativos de un entorno de demostración.',
+      items: {
+        a: {
+          quote: 'Las ausencias bajaron un tercio en el primer mes. Los recordatorios salen solos.',
+          name: 'Dra. Ana Ribeiro',
+          role: 'Clínica Vida, São Paulo',
+        },
+        b: {
+          quote: 'Nuestra recepción dejó de copiar datos entre sistemas. Solo eso ya pagó la suscripción.',
+          name: 'Miguel Torres',
+          role: 'Centro Médico Norte, Madrid',
+        },
+        c: {
+          quote: 'El asistente responde lo que los pacientes preguntan a medianoche, con nuestros datos y de forma segura.',
+          name: 'Sarah Johnson',
+          role: 'Lakeside Wellness, Austin',
+        },
+      },
+    },
+    pricing: {
+      title: 'Precios que crecen contigo',
+      subtitle: 'Empieza gratis por 14 días. Cambia o cancela cuando quieras.',
+      monthly: 'Mensual',
+      yearly: 'Anual',
+      save: 'Ahorra 20%',
+      popular: 'Más elegido',
+      perMonth: '/mes',
+      perMonthYearly: '/mes, facturado al año',
+      custom: 'A medida',
+      plans: {
+        starter: {
+          name: 'Inicial',
+          description: 'Para profesionales independientes',
+          features: ['Hasta 100 pacientes', 'Historias y análisis con IA', 'Recordatorios por correo', '1 miembro del equipo', 'Soporte de la comunidad'],
+          cta: 'Probar gratis',
+        },
+        clinic: {
+          name: 'Clínica',
+          description: 'Para clínicas en crecimiento',
+          features: ['Hasta 1000 pacientes', 'Bot de WhatsApp y automatizaciones', 'CRM y paneles', '10 miembros del equipo', 'Soporte prioritario'],
+          cta: 'Probar gratis',
+        },
+        enterprise: {
+          name: 'Empresa',
+          description: 'Para grupos y redes',
+          features: ['Pacientes ilimitados', 'Aislamiento de datos por clínica', 'API, webhooks y SSO', 'Implementación dedicada', 'SLA y revisión de cumplimiento'],
+          cta: 'Hablar con ventas',
+        },
+      },
+    },
+    faq: {
+      title: 'Preguntas frecuentes',
+      items: {
+        security: {
+          question: '¿Los datos de los pacientes están seguros?',
+          answer: 'Los datos de cada clínica están aislados en la base de datos con seguridad a nivel de fila, y cifrados en tránsito y en reposo. Esta demostración usa solo datos ficticios.',
+        },
+        app: {
+          question: '¿Los pacientes deben instalar una app?',
+          answer: 'No. Usan WhatsApp para recordatorios y confirmaciones, y opcionalmente pueden entrar a un portal web con su historial.',
+        },
+        integrations: {
+          question: '¿Puedo conectar mis herramientas?',
+          answer: 'Sí. Hay una API REST, webhooks salientes y plantillas listas de Zapier, Make y n8n.',
+        },
+        languages: {
+          question: '¿Qué idiomas están disponibles?',
+          answer: 'Toda la plataforma funciona en español, portugués e inglés, incluidos los mensajes automáticos.',
+        },
+        cancel: {
+          question: '¿Puedo cancelar cuando quiera?',
+          answer: 'Sí. Los planes son mensuales, sin permanencia, y puedes exportar todos tus datos antes de irte.',
+        },
+      },
+    },
+    cta: {
+      title: '¿Listo para devolverle el tiempo a tu equipo?',
+      subtitle: 'Crea una cuenta en menos de un minuto y mira tu primera automatización funcionando hoy.',
+      button: 'Crear cuenta gratis',
+      secondary: 'Iniciar sesión',
+    },
+    footer: {
+      product: 'Producto',
+      company: 'Empresa',
+      legal: 'Legal',
+      links: {
+        features: 'Funciones',
+        pricing: 'Precios',
+        integrations: 'Integraciones',
+        api: 'API',
+        about: 'Nosotros',
+        blog: 'Blog',
+        contact: 'Contacto',
+        privacy: 'Privacidad',
+        terms: 'Términos',
+        security: 'Seguridad',
+      },
+      rights: '© {year} HealthAI. Demostración de portafolio.',
+      demoNote: 'Proyecto de demostración: todos los datos, nombres y testimonios son ficticios.',
+    },
+  },
 };
 
 export default es;
