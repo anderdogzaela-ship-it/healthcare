@@ -227,6 +227,11 @@ const en = {
     vsLastWeek: 'vs last week',
     stepsThisWeek: 'Steps This Week',
     recentActivities: 'Recent Activities',
+    noActivities: 'No workouts logged yet. Add one from the health log.',
+    empty: {
+      title: 'Nothing to show yet',
+      description: 'Log steps or a workout and your weekly overview will appear here.',
+    },
   },
   chat: {
     conversations: 'Conversations',
@@ -272,6 +277,11 @@ const en = {
     metric: 'Metric (kg, km)',
     imperial: 'Imperial (lb, mi)',
     language: 'Language',
+    timezone: 'Timezone',
+    goalsTitle: 'Goals',
+    stepsGoal: 'Daily step goal',
+    sleepGoal: 'Sleep goal (hours)',
+    saveError: 'We could not save your changes. Please try again.',
     notificationsTitle: 'Notifications',
     notificationItems: {
       reminders: { label: 'Daily health reminders', description: 'Remind me to log vitals and activity' },

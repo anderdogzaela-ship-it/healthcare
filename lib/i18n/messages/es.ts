@@ -229,6 +229,11 @@ const es: Messages = {
     vsLastWeek: 'vs. la semana pasada',
     stepsThisWeek: 'Pasos esta semana',
     recentActivities: 'Actividades recientes',
+    noActivities: 'Aún no registraste entrenamientos. Agrega uno desde el registro de salud.',
+    empty: {
+      title: 'Todavía no hay nada que mostrar',
+      description: 'Registra pasos o un entrenamiento y tu resumen semanal aparecerá aquí.',
+    },
   },
   chat: {
     conversations: 'Conversaciones',
@@ -274,6 +279,11 @@ const es: Messages = {
     metric: 'Métrico (kg, km)',
     imperial: 'Imperial (lb, mi)',
     language: 'Idioma',
+    timezone: 'Zona horaria',
+    goalsTitle: 'Metas',
+    stepsGoal: 'Meta diaria de pasos',
+    sleepGoal: 'Meta de sueño (horas)',
+    saveError: 'No pudimos guardar tus cambios. Inténtalo de nuevo.',
     notificationsTitle: 'Notificaciones',
     notificationItems: {
       reminders: {
