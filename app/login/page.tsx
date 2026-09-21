@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Heart, Mail, Lock, Eye, EyeOff, Activity, ArrowLeft, AlertCircle } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { resendConfirmation, signIn, type AuthMessageKey } from '@/app/actions/auth';
 
 function LoginForm() {
@@ -131,7 +130,6 @@ function LoginForm() {
           <ArrowLeft className="w-4 h-4" />
           HealthAI
         </Link>
-        <LanguageSwitcher className="absolute top-4 right-4" />
 
         <div className="w-full max-w-md">
           {/* Mobile logo */}
