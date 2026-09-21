@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { createClient, requireUser } from '@/lib/supabase/server';
 import { healthLogSchema } from '@/lib/validation';
+import { logDbError } from '@/lib/supabase/log';
 
 export type SaveResult = { status: 'ok' } | { status: 'error'; reason: 'invalid' | 'failed' };
 
@@ -42,7 +43,10 @@ export async function saveHealthLog(formData: FormData): Promise<SaveResult> {
     notes: formData.get('notes') ?? undefined,
   });
 
-  if (!parsed.success) return { status: 'error', reason: 'invalid' };
+  if (!parsed.success) {
+    console.error('[validation] health log rejected:', parsed.error.issues);
+    return { status: 'error', reason: 'invalid' };
+  }
   const input = parsed.data;
 
   const supabase = createClient();
@@ -62,6 +66,7 @@ export async function saveHealthLog(formData: FormData): Promise<SaveResult> {
     .select('id')
     .single();
 
+  logDbError('health.daily_logs', logError);
   if (logError || !log) return { status: 'error', reason: 'failed' };
 
   // Replace the day's entries rather than accumulating duplicates when the

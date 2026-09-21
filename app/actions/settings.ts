@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient, requireUser } from '@/lib/supabase/server';
 import { goalsSchema, profileSchema, settingsSchema } from '@/lib/validation';
 import { localDate } from '@/lib/data/health';
+import { logDbError } from '@/lib/supabase/log';
 
 export type SettingsResult = { status: 'ok' } | { status: 'error' };
 
@@ -35,7 +36,14 @@ export async function updateSettings(formData: FormData): Promise<SettingsResult
     sleepHours: formData.get('sleepGoal'),
   });
 
-  if (!profile.success || !settings.success || !goals.success) return { status: 'error' };
+  if (!profile.success || !settings.success || !goals.success) {
+    console.error('[validation] settings rejected:', {
+      profile: profile.success ? null : profile.error.issues,
+      settings: settings.success ? null : settings.error.issues,
+      goals: goals.success ? null : goals.error.issues,
+    });
+    return { status: 'error' };
+  }
 
   const supabase = createClient();
 
@@ -77,6 +85,10 @@ export async function updateSettings(formData: FormData): Promise<SettingsResult
     ],
     { onConflict: 'user_id,metric,effective_from' }
   );
+
+  logDbError('settings.profile', profileError);
+  logDbError('settings.user_settings', settingsError);
+  logDbError('settings.goals', goalsError);
 
   if (profileError || settingsError || goalsError) return { status: 'error' };
 
