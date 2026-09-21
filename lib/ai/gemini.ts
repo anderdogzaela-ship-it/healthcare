@@ -1,4 +1,4 @@
-import { GoogleGenAI, type Content, type FunctionCall, type Part } from '@google/genai';
+import { GoogleGenAI, ThinkingLevel, type Content, type FunctionCall, type Part } from '@google/genai';
 import { runTool, tools } from '@/lib/ai/tools';
 
 /**
@@ -10,9 +10,20 @@ import { runTool, tools } from '@/lib/ai/tools';
 
 let client: GoogleGenAI | null = null;
 
-/** Created on first use, so a deployment without the key still builds. */
+/**
+ * Created on first use, so a deployment without the key still builds.
+ *
+ * The SDK's own retries are off. By default it retries an overloaded model up
+ * to five times with growing pauses, which kept users waiting many seconds;
+ * switching to another model straight away (below) answers much sooner.
+ */
 function gemini(): GoogleGenAI {
-  if (!client) client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  if (!client) {
+    client = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY,
+      httpOptions: { retryOptions: { attempts: 1 } },
+    });
+  }
   return client;
 }
 
@@ -24,15 +35,49 @@ const functionDeclarations = tools.map((tool) => ({
 }));
 
 /**
+ * How long Gemini 3 models think before answering. Reading a few numbers and
+ * summarising them does not need deep reasoning, and every level up adds
+ * seconds, twice per question when a tool is called. GEMINI_THINKING can raise
+ * it: minimal, low, medium or high.
+ */
+const THINKING_LEVELS: Record<string, ThinkingLevel> = {
+  minimal: ThinkingLevel.MINIMAL,
+  low: ThinkingLevel.LOW,
+  medium: ThinkingLevel.MEDIUM,
+  high: ThinkingLevel.HIGH,
+};
+const thinkingLevel = THINKING_LEVELS[(process.env.GEMINI_THINKING ?? '').trim().toLowerCase()] ?? ThinkingLevel.LOW;
+
+/** Only the Gemini 3 family takes a thinking level; 2.5 models reject it. */
+const thinkingConfigFor = (model: string) =>
+  model.startsWith('gemini-3') ? { thinkingConfig: { thinkingLevel } } : {};
+
+/**
  * Tried in order when the chosen model is overloaded (503), out of free quota
  * (429) or retired for new accounts (404), which happens on the free tier.
  */
 const FALLBACK_MODELS = ['gemini-3.5-flash', 'gemini-3-flash-preview'];
 const RETRYABLE = new Set([404, 429, 503]);
 
-function isRetryable(error: unknown): boolean {
+function statusOf(error: unknown): number | undefined {
   const status = (error as { status?: number })?.status;
-  return typeof status === 'number' && RETRYABLE.has(status);
+  return typeof status === 'number' ? status : undefined;
+}
+
+/**
+ * Models that just failed are skipped for a while, so the next questions do
+ * not each pay for a doomed first attempt. Per server instance, which is
+ * enough: an instance serves many requests in a row.
+ */
+const COOLDOWN_MS: Record<number, number> = { 404: 60 * 60 * 1000, 429: 5 * 60 * 1000, 503: 5 * 60 * 1000 };
+const coolingUntil = new Map<string, number>();
+
+function orderModels(preferred: string): string[] {
+  const all = [preferred, ...FALLBACK_MODELS.filter((model) => model !== preferred)];
+  const now = Date.now();
+  const ready = all.filter((model) => (coolingUntil.get(model) ?? 0) <= now);
+  // If every model is cooling down, try them all anyway rather than give up.
+  return ready.length > 0 ? [...ready, ...all.filter((model) => !ready.includes(model))] : all;
 }
 
 export interface GeminiTurn {
@@ -46,20 +91,22 @@ export interface GeminiTurn {
   send: (text: string) => void;
 }
 
-/** Streams one answer and returns its full text. */
-export async function answerWithGemini(turn: GeminiTurn): Promise<string> {
+/** Streams one answer; returns its text and the model that wrote it. */
+export async function answerWithGemini(turn: GeminiTurn): Promise<{ answer: string; model: string; rounds: number }> {
   const contents: Content[] = turn.history.map((row) => ({
     role: row.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: row.content }],
   }));
 
-  const models = [turn.model, ...FALLBACK_MODELS.filter((model) => model !== turn.model)];
+  const models = orderModels(turn.model);
   // Once a model answers, later rounds stay on it: the thought signatures it
   // returned belong to that model.
   let current = 0;
   let answer = '';
+  let rounds = 0;
 
   for (let round = 0; round < turn.maxToolRounds; round++) {
+    rounds = round + 1;
     // Every part is kept, not just the text: function calls carry a thought
     // signature that must be sent back unchanged with their results.
     let parts: Part[] = [];
@@ -69,15 +116,17 @@ export async function answerWithGemini(turn: GeminiTurn): Promise<string> {
       parts = [];
       calls = [];
       const answeredBefore = answer.length;
+      const model = models[attempt];
 
       try {
         const stream = await gemini().models.generateContentStream({
-          model: models[attempt],
+          model,
           contents,
           config: {
             systemInstruction: turn.system,
             maxOutputTokens: turn.maxTokens,
             tools: [{ functionDeclarations }],
+            ...thinkingConfigFor(model),
           },
         });
 
@@ -94,11 +143,15 @@ export async function answerWithGemini(turn: GeminiTurn): Promise<string> {
         current = attempt;
         break;
       } catch (error) {
+        const status = statusOf(error);
+        if (status !== undefined && COOLDOWN_MS[status]) coolingUntil.set(model, Date.now() + COOLDOWN_MS[status]);
+
         // Another model may answer, but only if this one has not started to:
         // text already sent cannot be taken back.
-        const canRetry = isRetryable(error) && answer.length === answeredBefore && attempt + 1 < models.length;
+        const canRetry =
+          status !== undefined && RETRYABLE.has(status) && answer.length === answeredBefore && attempt + 1 < models.length;
         if (!canRetry) throw error;
-        console.warn(`gemini ${models[attempt]} unavailable, trying ${models[attempt + 1]}`);
+        console.warn(`gemini ${model} answered ${status}, trying ${models[attempt + 1]}`);
       }
     }
 
@@ -119,5 +172,5 @@ export async function answerWithGemini(turn: GeminiTurn): Promise<string> {
     });
   }
 
-  return answer;
+  return { answer, model: models[current], rounds };
 }

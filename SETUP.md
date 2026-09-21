@@ -241,6 +241,13 @@ runs before any model is called, whichever provider is set. Two differences:
   accounts. When the chosen model answers 503, 429 or 404, the next one is
   tried (`gemini-3.5-flash`, then `gemini-3-flash-preview`) before any error is
   shown.
+- **Speed.** Gemini 3 models are asked to think at the *low* level
+  (`GEMINI_THINKING` changes it), because every level up adds seconds, twice
+  per question when the assistant reads data. The SDK's own retries are off:
+  an overloaded model is replaced by the next one straight away and skipped
+  for five minutes. Each answer logs a line such as
+  `chat timing: provider=gemini model=gemini-3.5-flash rounds=2 prepare=180ms first_text=2900ms total=4100ms`,
+  so the deployment logs show where the time went.
 - **Limits.** The free tier allows a small number of requests per minute and
   per day, which suits a demo, not production. When it is used up, the
   assistant shows its usual error message.
