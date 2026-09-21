@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { createClient, requireUser } from '@/lib/supabase/server';
 import { goalsSchema, profileSchema, settingsSchema } from '@/lib/validation';
 import { localDate } from '@/lib/data/health';
+import { logDbError } from '@/lib/supabase/log';
 
 export type SettingsResult = { status: 'ok' } | { status: 'error' };
 
@@ -35,7 +36,14 @@ export async function updateSettings(formData: FormData): Promise<SettingsResult
     sleepHours: formData.get('sleepGoal'),
   });
 
-  if (!profile.success || !settings.success || !goals.success) return { status: 'error' };
+  if (!profile.success || !settings.success || !goals.success) {
+    console.error('[validation] settings rejected:', {
+      profile: profile.success ? null : profile.error.issues,
+      settings: settings.success ? null : settings.error.issues,
+      goals: goals.success ? null : goals.error.issues,
+    });
+    return { status: 'error' };
+  }
 
   const supabase = createClient();
 
@@ -43,29 +51,31 @@ export async function updateSettings(formData: FormData): Promise<SettingsResult
   const digits = (profile.data.phone ?? '').replace(/\D/g, '');
   const phone = digits ? `+${digits}` : null;
 
+  // Upsert, not update: an account created before the schema existed has no
+  // profile row, and an update would report success while changing nothing.
   const { error: profileError } = await supabase
     .from('profiles')
-    .update({
+    .upsert({
+      id: user.id,
       full_name: profile.data.fullName,
       phone,
       date_of_birth: profile.data.dateOfBirth ? profile.data.dateOfBirth : null,
       unit_system: profile.data.unitSystem,
       locale: profile.data.locale,
       timezone: profile.data.timezone,
-    })
-    .eq('id', user.id);
+    }, { onConflict: 'id' });
 
   const { error: settingsError } = await supabase
     .from('user_settings')
-    .update({
+    .upsert({
+      user_id: user.id,
       reminders: settings.data.reminders,
       insights: settings.data.insights,
       weekly_report: settings.data.weeklyReport,
       achievements: settings.data.achievements,
       share_data: settings.data.shareData,
       analytics: settings.data.analytics,
-    })
-    .eq('user_id', user.id);
+    }, { onConflict: 'user_id' });
 
   // A changed goal applies from today, leaving past days with the goal that
   // was in force when they happened.
@@ -77,6 +87,10 @@ export async function updateSettings(formData: FormData): Promise<SettingsResult
     ],
     { onConflict: 'user_id,metric,effective_from' }
   );
+
+  logDbError('settings.profile', profileError);
+  logDbError('settings.user_settings', settingsError);
+  logDbError('settings.goals', goalsError);
 
   if (profileError || settingsError || goalsError) return { status: 'error' };
 

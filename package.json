@@ -9,7 +9,9 @@
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test",
     "db:push": "supabase db push",
-    "db:types": "supabase gen types typescript --linked > lib/supabase/database.types.ts"
+    "db:types": "supabase gen types typescript --linked > lib/supabase/database.types.ts",
+    "db:bundle": "node scripts/bundle-migrations.mjs",
+    "db:check": "node scripts/check-migrations.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.127.0",

@@ -53,7 +53,11 @@ export default function TeamView({
         form.reset();
         router.refresh();
       } else if (result.status === 'error') {
-        setError(result.reason === 'limit' ? m.team.seatLimit : m.team.error);
+        setError(
+          result.reason === 'limitFree' ? m.team.seatLimitFree
+          : result.reason === 'limit' ? m.team.seatLimit
+          : m.team.error
+        );
       }
     });
   };

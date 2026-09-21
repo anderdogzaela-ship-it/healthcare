@@ -32,7 +32,7 @@ export default function ChatView({
   const [conversationId, setConversationId] = useState<string | null>(activeId);
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
-  const [errorKey, setErrorKey] = useState<'error' | 'rateLimited' | null>(null);
+  const [errorKey, setErrorKey] = useState<'error' | 'rateLimited' | 'notConfigured' | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -57,6 +57,11 @@ export default function ChatView({
 
       if (response.status === 429) {
         setErrorKey('rateLimited');
+        return;
+      }
+      // The deployment has no Anthropic key: say so instead of "try again".
+      if (response.status === 503) {
+        setErrorKey('notConfigured');
         return;
       }
       if (!response.ok || !response.body) {

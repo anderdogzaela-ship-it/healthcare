@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createClient, requireUser } from '@/lib/supabase/server';
+import { logDbError } from '@/lib/supabase/log';
 
 export type AppointmentResult = { status: 'ok' } | { status: 'error'; reason: 'invalid' | 'failed' };
 
@@ -62,7 +63,10 @@ export async function createAppointment(formData: FormData): Promise<Appointment
     timezoneOffset: formData.get('timezoneOffset') ?? 0,
   });
 
-  if (!parsed.success) return { status: 'error', reason: 'invalid' };
+  if (!parsed.success) {
+    console.error('[validation] appointment rejected:', parsed.error.issues);
+    return { status: 'error', reason: 'invalid' };
+  }
   const input = parsed.data;
 
   // The browser sends local wall-clock time plus its offset; store UTC.
@@ -84,6 +88,7 @@ export async function createAppointment(formData: FormData): Promise<Appointment
     .select('id')
     .single();
 
+  logDbError('appointments.insert', error);
   if (error || !data) return { status: 'error', reason: 'failed' };
 
   await scheduleReminders(data.id, user.id, startsAt);

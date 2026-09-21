@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { hashApiKey, readApiKey } from './keys';
 import { consumeRateLimit, rateLimited } from './rate-limit';
+import { logDbError } from '@/lib/supabase/log';
 
 export interface ApiCaller {
   clinicId: string;
@@ -18,11 +19,18 @@ export async function authenticateRequest(request: Request): Promise<ApiCaller |
   if (!key || key.length < 16) return null;
 
   const admin = createAdminClient();
-  const { data } = await admin
+  const { data, error } = await admin
     .from('api_keys')
     .select('id, clinic_id, revoked_at')
     .eq('key_hash', hashApiKey(key))
     .maybeSingle();
+
+  // A failed lookup is a server problem, not an unknown key: let the caller
+  // answer 503 rather than telling the integrator their key is wrong.
+  if (error) {
+    logDbError('api.authenticate', error);
+    throw new Error(`API key lookup failed: ${error.message}`);
+  }
 
   if (!data || data.revoked_at) return null;
 

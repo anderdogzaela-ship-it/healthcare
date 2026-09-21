@@ -99,6 +99,7 @@ const pt: Messages = {
     revoke: 'Revogar',
     remove: 'Remover',
     seatLimit: 'Seu plano não tem mais vagas. Faça upgrade para convidar mais pessoas.',
+    seatLimitFree: 'No plano gratuito você pode adicionar até duas pessoas; faça upgrade do seu plano para adicionar mais.',
     ownerOnly: 'Só o proprietário da clínica pode gerenciar a equipe.',
     error: 'Algo deu errado. Tente novamente.',
     accept: {
@@ -159,7 +160,7 @@ const pt: Messages = {
     manage: 'Gerenciar cobrança',
     opening: 'Abrindo...',
     contactSales: 'Falar com vendas',
-    notConfigured: 'A cobrança não está configurada neste ambiente, então os planos não podem ser alterados aqui.',
+    notConfigured: 'A cobrança não está configurada neste ambiente: os planos não podem ser alterados aqui e o limite de pacientes não é aplicado.',
     ownerOnly: 'Só o proprietário da clínica pode mudar o plano.',
     error: 'Algo deu errado. Tente novamente.',
     checkoutSuccess: 'Assinatura atualizada. Obrigado!',
@@ -436,6 +437,7 @@ const pt: Messages = {
     thinking: 'Lendo seus dados...',
     error: 'Algo deu errado. Tente novamente.',
     rateLimited: 'Você atingiu o limite de mensagens por hora. Tente mais tarde.',
+    notConfigured: 'O assistente ainda não está configurado neste ambiente.',
   },
   settings: {
     title: 'Configurações',
@@ -644,7 +646,7 @@ const pt: Messages = {
         starter: {
           name: 'Inicial',
           description: 'Para profissionais autônomos',
-          features: ['Até 100 pacientes', 'Prontuário e análise com IA', 'Lembretes por e-mail', '1 pessoa na equipe', 'Suporte da comunidade'],
+          features: ['Até 100 pacientes', 'Prontuário e análise com IA', 'Lembretes por e-mail', 'Você + 2 pessoas na equipe', 'Suporte da comunidade'],
           cta: 'Testar grátis',
         },
         clinic: {

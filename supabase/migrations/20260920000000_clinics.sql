@@ -94,18 +94,6 @@ alter table public.reminder_jobs
 alter table public.automation_events
   add column patient_id uuid references public.patients (id) on delete set null;
 
--- Staff read the reminders of their clinic's appointments.
-create policy "clinic staff read clinic reminders" on public.reminder_jobs
-  for select to authenticated
-  using (
-    exists (
-      select 1 from public.appointments a
-      where a.id = appointment_id
-        and a.clinic_id is not null
-        and public.is_clinic_member(a.clinic_id)
-    )
-  );
-
 -- ------------------------------------------------------- membership ----
 
 -- Security definer: reads clinic_members with RLS bypassed, which is what
@@ -186,6 +174,20 @@ create policy "clinic staff manage clinic appointments" on public.appointments
   for all to authenticated
   using (clinic_id is not null and public.is_clinic_member(clinic_id))
   with check (clinic_id is not null and public.is_clinic_member(clinic_id));
+
+-- Staff read the reminders of their clinic's appointments. Defined here,
+-- after is_clinic_member exists: a policy's expression is resolved when the
+-- policy is created, not when it runs.
+create policy "clinic staff read clinic reminders" on public.reminder_jobs
+  for select to authenticated
+  using (
+    exists (
+      select 1 from public.appointments a
+      where a.id = appointment_id
+        and a.clinic_id is not null
+        and public.is_clinic_member(a.clinic_id)
+    )
+  );
 
 grant select, insert, update, delete on all tables in schema public to authenticated;
 grant execute on function public.is_clinic_member(uuid) to authenticated;
