@@ -429,6 +429,8 @@ const es: Messages = {
     },
   },
   chat: {
+    showConversations: 'Ver conversaciones',
+    closeConversations: 'Cerrar conversaciones',
     deleteConversation: 'Eliminar conversación',
     deleteConfirm: '¿Eliminar esta conversación? No se puede deshacer.',
     conversations: 'Conversaciones',

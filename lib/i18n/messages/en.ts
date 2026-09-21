@@ -427,6 +427,8 @@ const en = {
     },
   },
   chat: {
+    showConversations: 'Show conversations',
+    closeConversations: 'Close conversations',
     deleteConversation: 'Delete conversation',
     deleteConfirm: 'Delete this conversation? This cannot be undone.',
     conversations: 'Conversations',
