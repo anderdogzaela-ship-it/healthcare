@@ -68,9 +68,9 @@ curl -s -X POST -H "x-api-key: $AUTOMATION_API_KEY" -H "content-type: applicatio
   "$BASE_URL/api/automation/whatsapp/inbound" | python -m json.tool
 ```
 
-The number must match the phone saved on a user's profile, otherwise the route
-answers `{ "matched": false }` — it never reveals whether a number has an
-account.
+The number must match a phone saved on an app user's profile or on a clinic's
+patient record, otherwise the route answers `{ "matched": false }` — it never
+reveals whether a number is known.
 
 ## Zapier and Make
 
