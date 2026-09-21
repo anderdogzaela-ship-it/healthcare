@@ -205,7 +205,7 @@ export async function POST(request: Request) {
           messages.push({ role: 'user', content: results });
         }
       } catch (error) {
-        console.error('chat stream failed', error);
+        console.error(`chat stream failed (provider ${AI_PROVIDER}, model ${MODEL})`, error);
         if (!answer) send('__error__');
       }
 
