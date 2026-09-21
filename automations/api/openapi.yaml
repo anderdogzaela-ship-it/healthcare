@@ -1,25 +1,44 @@
 openapi: 3.1.0
 info:
   title: HealthAI public API
-  version: "1.0.0"
+  version: "1.1.0"
   description: |
     Per-clinic API for patients and appointments.
 
     Authenticate with an API key created under Clinic → API and webhooks:
     `Authorization: Bearer hai_...` (the header `x-api-key` also works).
-    A key is scoped to one clinic and can never read another clinic's data.
+    A key is scoped to one clinic and can never read another clinic's data;
+    an id from another clinic answers 404, exactly like an id that does not
+    exist.
 
     Each key is either **read only** or **read and write**, chosen when it is
     created. A read-only key may call every GET endpoint; POST, PATCH and
     DELETE answer 403 `insufficient_scope`. `GET /me` reports the key's access.
+
+    Every key may make 120 requests per minute. Errors share one shape:
+    `{"error": "<code>", "detail": ...}`.
 servers:
+  - url: https://healthcare-beta-lemon.vercel.app/api/v1
+    description: Live demo
   - url: https://your-app.vercel.app/api/v1
+    description: Your own deployment
 security:
   - bearerAuth: []
+  - apiKeyHeader: []
+tags:
+  - name: Account
+    description: Check a key and the clinic it belongs to
+  - name: Patients
+    description: The clinic's patient records (CRM)
+  - name: Appointments
+    description: Bookings, with automatic WhatsApp reminders and webhooks
 paths:
   /me:
     get:
+      operationId: getMe
+      tags: [Account]
       summary: Check the key and see which clinic it belongs to
+      description: The call to make first, to confirm a key works and see what it may do.
       responses:
         "200":
           description: Key is valid
@@ -38,13 +57,20 @@ paths:
                       scopes:
                         type: array
                         items: { type: string }
+                        example: [patients:read, appointments:read]
         "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/NotConfigured" }
+
   /patients:
     get:
+      operationId: listPatients
+      tags: [Patients]
       summary: List patients
+      description: Newest first. Archived patients are included unless `status` filters them out; an unknown `status` is ignored.
       parameters:
-        - { name: limit, in: query, schema: { type: integer, default: 50, maximum: 200 } }
-        - { name: offset, in: query, schema: { type: integer, default: 0 } }
+        - { name: limit, in: query, schema: { type: integer, default: 50, minimum: 1, maximum: 200 } }
+        - { name: offset, in: query, schema: { type: integer, default: 0, minimum: 0 } }
         - name: status
           in: query
           schema: { type: string, enum: [lead, active, inactive, archived] }
@@ -66,8 +92,12 @@ paths:
                       offset: { type: integer }
                       total: { type: integer }
         "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
     post:
+      operationId: createPatient
+      tags: [Patients]
       summary: Create a patient
+      description: Sends the `patient.created` webhook.
       requestBody:
         required: true
         content:
@@ -77,11 +107,17 @@ paths:
               required: [full_name]
               properties:
                 full_name: { type: string, minLength: 2, maxLength: 120 }
-                phone: { type: string, description: "Any format; stored as +digits" }
+                phone: { type: string, maxLength: 30, description: "Any format; stored as +digits" }
                 email: { type: string, format: email }
                 date_of_birth: { type: string, format: date }
                 locale: { type: string, enum: [en, es, pt], default: en }
                 status: { type: string, enum: [lead, active, inactive], default: lead }
+            example:
+              full_name: Ana Souza
+              phone: "+55 11 91234-5678"
+              email: ana@example.com
+              locale: pt
+              status: active
       responses:
         "201":
           description: Created
@@ -94,13 +130,109 @@ paths:
         "400": { $ref: "#/components/responses/InvalidBody" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/InsufficientScope" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+
+  /patients/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Id" }
+    get:
+      operationId: getPatient
+      tags: [Patients]
+      summary: Get one patient
+      description: Includes the patient's `notes`, which the list leaves out.
+      responses:
+        "200":
+          description: The patient
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/PatientDetail" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+    patch:
+      operationId: updatePatient
+      tags: [Patients]
+      summary: Update a patient
+      description: |
+        Partial update: only the fields sent are changed. Send `null` to clear
+        an optional field. An empty body answers 400 `empty_patch`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                full_name: { type: string, minLength: 2, maxLength: 120 }
+                phone: { type: [string, "null"], maxLength: 30, description: "Any format; stored as +digits" }
+                email: { type: [string, "null"], format: email }
+                date_of_birth: { type: [string, "null"], format: date }
+                locale: { type: string, enum: [en, es, pt] }
+                status: { type: string, enum: [lead, active, inactive, archived] }
+                notes: { type: [string, "null"], maxLength: 4000 }
+            example:
+              status: active
+              notes: Prefers morning appointments.
+      responses:
+        "200":
+          description: The updated patient
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Patient" }
+        "400": { $ref: "#/components/responses/InvalidBody" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/InsufficientScope" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+    delete:
+      operationId: deletePatient
+      tags: [Patients]
+      summary: Archive or erase a patient
+      description: |
+        By default the patient is **archived** (`status: archived`), which keeps
+        their appointment history. With `?hard=true` the record is deleted for
+        good, together with its notes and appointments, which is what a data
+        erasure request under the LGPD or the GDPR needs.
+      parameters:
+        - name: hard
+          in: query
+          schema: { type: boolean, default: false }
+      responses:
+        "200":
+          description: Archived
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id: { type: string, format: uuid }
+                      status: { type: string, enum: [archived] }
+        "204": { description: Deleted for good (`hard=true`) }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/InsufficientScope" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+
   /appointments:
     get:
+      operationId: listAppointments
+      tags: [Appointments]
       summary: List appointments
+      description: Sorted by start time, earliest first.
       parameters:
-        - { name: from, in: query, schema: { type: string, format: date-time } }
-        - { name: to, in: query, schema: { type: string, format: date-time } }
-        - { name: limit, in: query, schema: { type: integer, default: 50, maximum: 200 } }
+        - { name: from, in: query, description: Start of the range (inclusive), schema: { type: string, format: date-time } }
+        - { name: to, in: query, description: End of the range (inclusive), schema: { type: string, format: date-time } }
+        - { name: limit, in: query, schema: { type: integer, default: 50, minimum: 1, maximum: 200 } }
       responses:
         "200":
           description: Appointments in the range
@@ -113,8 +245,12 @@ paths:
                     type: array
                     items: { $ref: "#/components/schemas/Appointment" }
         "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
     post:
+      operationId: createAppointment
+      tags: [Appointments]
       summary: Book an appointment and queue its WhatsApp reminders
+      description: Sends the `appointment.created` webhook.
       requestBody:
         required: true
         content:
@@ -129,13 +265,19 @@ paths:
                   format: date-time
                   description: "ISO 8601 with offset, e.g. 2026-09-25T14:30:00-03:00"
                 duration_min: { type: integer, default: 30, minimum: 5, maximum: 480 }
-                professional: { type: string }
-                location: { type: string }
-                reason: { type: string }
+                professional: { type: string, maxLength: 120 }
+                location: { type: string, maxLength: 160 }
+                reason: { type: string, maxLength: 500 }
                 reminders:
                   type: boolean
                   default: true
                   description: Queue the 24h and 2h reminders
+            example:
+              patient_id: 3f1c2a9e-5b7d-4c1e-9a0b-2d4e6f8a1b3c
+              starts_at: "2026-09-25T14:30:00-03:00"
+              duration_min: 30
+              professional: Dr. Lima
+              reason: Follow-up
       responses:
         "201":
           description: Created
@@ -148,20 +290,168 @@ paths:
         "400": { $ref: "#/components/responses/InvalidBody" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/InsufficientScope" }
-        "404": { description: The patient does not belong to this clinic }
+        "404":
+          description: The patient does not belong to this clinic (`patient_not_found`)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+
+  /appointments/{id}:
+    parameters:
+      - { $ref: "#/components/parameters/Id" }
+    get:
+      operationId: getAppointment
+      tags: [Appointments]
+      summary: Get one appointment
+      responses:
+        "200":
+          description: The appointment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Appointment" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+    patch:
+      operationId: updateAppointment
+      tags: [Appointments]
+      summary: Reschedule, confirm, cancel or edit an appointment
+      description: |
+        Partial update: only the fields sent are changed.
+
+        - Changing `starts_at` re-queues the 24h and 2h reminders for the new
+          time (unless the appointment is cancelled).
+        - `status: confirmed` records the confirmation time and sends the
+          `appointment.confirmed` webhook.
+        - `status: cancelled` stops pending reminders and sends the
+          `appointment.cancelled` webhook.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              properties:
+                starts_at: { type: string, format: date-time, description: ISO 8601 with offset }
+                duration_min: { type: integer, minimum: 5, maximum: 480 }
+                professional: { type: string, maxLength: 120 }
+                location: { type: [string, "null"], maxLength: 160 }
+                reason: { type: [string, "null"], maxLength: 500 }
+                status: { type: string, enum: [scheduled, confirmed, cancelled, completed, no_show] }
+            examples:
+              reschedule:
+                value: { starts_at: "2026-09-26T09:00:00-03:00" }
+              confirm:
+                value: { status: confirmed }
+      responses:
+        "200":
+          description: The updated appointment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Appointment" }
+        "400": { $ref: "#/components/responses/InvalidBody" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/InsufficientScope" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+    delete:
+      operationId: cancelAppointment
+      tags: [Appointments]
+      summary: Cancel an appointment
+      description: |
+        The appointment is kept with `status: cancelled`, its pending reminders
+        are stopped, and the `appointment.cancelled` webhook is sent.
+      responses:
+        "200":
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id: { type: string, format: uuid }
+                      patient_id: { type: [string, "null"], format: uuid }
+                      starts_at: { type: string, format: date-time }
+                      status: { type: string, enum: [cancelled] }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/InsufficientScope" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
+    apiKeyHeader:
+      type: apiKey
+      in: header
+      name: x-api-key
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
   responses:
     Unauthorized:
-      description: Missing, unknown or revoked API key
+      description: Missing, unknown or revoked API key (`unauthorized`)
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
     InsufficientScope:
-      description: The key is read-only and the request would change data
+      description: The key is read-only and the request would change data (`insufficient_scope`)
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
     InvalidBody:
-      description: Validation failed; `detail` lists the offending fields
+      description: |
+        Validation failed (`invalid_body`, with `detail` listing each field and
+        what is wrong with it), or a PATCH changed nothing (`empty_patch`).
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          example:
+            error: invalid_body
+            detail:
+              - { field: starts_at, message: Invalid datetime }
+    NotFound:
+      description: No such record in this key's clinic (`not_found`)
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    RateLimited:
+      description: More than 120 requests in a minute (`rate_limited`)
+      headers:
+        Retry-After:
+          description: Seconds to wait before retrying
+          schema: { type: integer }
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotConfigured:
+      description: The server cannot verify keys right now (`not_configured`); retry later
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
   schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string, description: "A stable, machine-readable code" }
+        detail: { description: Extra information; its shape depends on the error }
     Clinic:
       type: object
       properties:
@@ -174,22 +464,29 @@ components:
       properties:
         id: { type: string, format: uuid }
         full_name: { type: string }
-        email: { type: string, nullable: true }
-        phone: { type: string, nullable: true }
+        email: { type: [string, "null"] }
+        phone: { type: [string, "null"] }
         status: { type: string, enum: [lead, active, inactive, archived] }
         locale: { type: string, enum: [en, es, pt] }
-        date_of_birth: { type: string, format: date, nullable: true }
+        date_of_birth: { type: [string, "null"], format: date }
         created_at: { type: string, format: date-time }
+    PatientDetail:
+      allOf:
+        - $ref: "#/components/schemas/Patient"
+        - type: object
+          properties:
+            notes: { type: [string, "null"] }
     Appointment:
       type: object
       properties:
         id: { type: string, format: uuid }
-        patient_id: { type: string, format: uuid, nullable: true }
+        patient_id: { type: [string, "null"], format: uuid }
         starts_at: { type: string, format: date-time }
         duration_min: { type: integer }
         professional: { type: string }
-        location: { type: string, nullable: true }
-        reason: { type: string, nullable: true }
+        location: { type: [string, "null"] }
+        reason: { type: [string, "null"] }
         status:
           type: string
           enum: [scheduled, confirmed, cancelled, completed, no_show]
+        created_at: { type: string, format: date-time }
