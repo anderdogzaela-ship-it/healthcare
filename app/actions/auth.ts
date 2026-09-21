@@ -126,3 +126,23 @@ export async function updatePassword(formData: FormData): Promise<AuthResult> {
 
   return { status: 'success', messageKey: 'passwordUpdated' };
 }
+
+/**
+ * Sends the sign-up confirmation email again. For someone whose first link
+ * expired, was opened on the wrong device, or pointed somewhere it should not
+ * have: without this there was no way to get a new one.
+ */
+export async function resendConfirmation(formData: FormData): Promise<AuthResult> {
+  const parsed = emailSchema.safeParse({ email: formData.get('email') });
+  // Same answer either way, so the form does not reveal which addresses exist.
+  if (!parsed.success) return { status: 'success', messageKey: 'confirmationResent' };
+
+  const supabase = createClient();
+  await supabase.auth.resend({
+    type: 'signup',
+    email: parsed.data.email,
+    options: { emailRedirectTo: `${siteUrl()}/auth/callback` },
+  });
+
+  return { status: 'success', messageKey: 'confirmationResent' };
+}

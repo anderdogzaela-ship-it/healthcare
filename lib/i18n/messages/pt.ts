@@ -230,6 +230,8 @@ const pt: Messages = {
     consentRequired: 'Aceite os termos para criar sua conta.',
     consentLabel: 'Concordo com os {terms} e com a {privacy}, incluindo o tratamento dos meus dados de saúde.',
     passwordUpdated: 'Sua senha foi alterada.',
+    resendConfirmation: 'Reenviar o e-mail de confirmação',
+    confirmationResent: 'Se este endereço estiver aguardando confirmação, um novo link está a caminho.',
   },
   resetPassword: {
     title: 'Escolha uma nova senha',

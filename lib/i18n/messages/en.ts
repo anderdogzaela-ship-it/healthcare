@@ -229,6 +229,8 @@ const en = {
     consentRequired: 'Please accept the terms to create your account.',
     consentLabel: 'I agree to the {terms} and the {privacy}, including the processing of my health data.',
     passwordUpdated: 'Your password has been changed.',
+    resendConfirmation: 'Send the confirmation email again',
+    confirmationResent: 'If this address is waiting for confirmation, a new link is on its way.',
   },
   resetPassword: {
     title: 'Choose a new password',

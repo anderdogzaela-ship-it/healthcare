@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { Heart, Mail, Lock, Eye, EyeOff, Activity, ArrowLeft, AlertCircle } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import { signIn, type AuthMessageKey } from '@/app/actions/auth';
+import { resendConfirmation, signIn, type AuthMessageKey } from '@/app/actions/auth';
 
 function LoginForm() {
   const { m, fmt, formatNumber } = useI18n();
@@ -15,7 +15,20 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorKey, setErrorKey] = useState<AuthMessageKey | null>(null);
+  const [resent, setResent] = useState(false);
+  const [resending, startResending] = useTransition();
   const [pending, startTransition] = useTransition();
+
+  // Offered when sign-in fails because the email was never confirmed, so a
+  // user whose first link did not work is not stuck.
+  const handleResend = () => {
+    const formData = new FormData();
+    formData.set('email', email);
+    startResending(async () => {
+      await resendConfirmation(formData);
+      setResent(true);
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,9 +149,25 @@ function LoginForm() {
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Error from the server action */}
               {errorKey && (
-                <div role="alert" className="flex items-start gap-2.5 p-3.5 rounded-xl bg-red-50 border border-red-100 animate-fade-in">
-                  <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-red-700">{m.auth[errorKey]}</p>
+                <div role="alert" className="p-3.5 rounded-xl bg-red-50 border border-red-100 animate-fade-in">
+                  <div className="flex items-start gap-2.5">
+                    <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-red-700">{m.auth[errorKey]}</p>
+                  </div>
+                  {errorKey === 'emailNotConfirmed' && (
+                    resent ? (
+                      <p className="mt-2 ml-7 text-sm text-emerald-700">{m.auth.confirmationResent}</p>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleResend}
+                        disabled={resending || !email}
+                        className="mt-2 ml-7 text-sm font-semibold text-emerald-700 hover:text-emerald-800 underline disabled:opacity-60"
+                      >
+                        {m.auth.resendConfirmation}
+                      </button>
+                    )
+                  )}
                 </div>
               )}
 

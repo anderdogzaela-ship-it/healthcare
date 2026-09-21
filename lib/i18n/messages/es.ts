@@ -230,6 +230,8 @@ const es: Messages = {
     consentRequired: 'Acepta los términos para crear tu cuenta.',
     consentLabel: 'Acepto los {terms} y la {privacy}, incluido el tratamiento de mis datos de salud.',
     passwordUpdated: 'Tu contraseña fue cambiada.',
+    resendConfirmation: 'Enviar de nuevo el correo de confirmación',
+    confirmationResent: 'Si esta dirección está pendiente de confirmación, ya va en camino un nuevo enlace.',
   },
   resetPassword: {
     title: 'Elige una nueva contraseña',
