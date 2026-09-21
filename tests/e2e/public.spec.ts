@@ -79,14 +79,15 @@ test.describe('languages', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Lleva tu clínica en');
   });
 
-  test('switching language from the login page persists', async ({ page }) => {
-    await page.goto('/login');
-    await expect(page.getByRole('heading', { name: 'Welcome back' })).toBeVisible();
-
+  test('a language chosen on the landing page carries over to sign-in', async ({ page }) => {
+    await page.goto('/');
     await page.getByRole('combobox').first().selectOption('pt');
-
     await expect(page.locator('html')).toHaveAttribute('lang', 'pt-BR');
+
+    // The sign-in page has no switcher of its own; it follows the saved choice.
+    await page.goto('/login');
     await expect(page.getByRole('heading', { name: /Que bom ter você de volta/ })).toBeVisible();
+    await expect(page.getByRole('combobox')).toHaveCount(0);
   });
 });
 
