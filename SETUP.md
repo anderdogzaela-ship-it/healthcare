@@ -27,7 +27,7 @@ cp .env.example .env.local
    NEXT_PUBLIC_SUPABASE_URL=https://<your-ref>.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon key>
    NEXT_PUBLIC_SITE_URL=http://localhost:3000
-   ANTHROPIC_API_KEY=sk-ant-...
+   ANTHROPIC_API_KEY=sk-ant-...   # or the Bedrock variables, see "The AI assistant"
    SUPABASE_SERVICE_ROLE_KEY=<service role key>
    AUTOMATION_API_KEY=<random 32+ character secret>
    ```
@@ -188,7 +188,7 @@ Three safeguards:
   no reassurance about symptoms, and abnormal readings are never softened.
 - **Rate limit.** 40 messages per user per hour, checked before any spend.
 
-Server-side fallbacks are enabled on Opus 5, so if the model declines a
+On the Claude API, server-side fallbacks are enabled for Opus 5, so if the model declines a
 request it is retried on a fallback model instead of failing.
 
 **Choosing a model.** `ANTHROPIC_MODEL` switches the model without code
@@ -203,6 +203,42 @@ changes; the default is `claude-opus-5`. Rough cost per question, assuming about
 
 These are estimates; the Anthropic console shows the real usage. Cost scales with use: each
 answer is one or more Claude calls, so watch usage in the Anthropic console.
+
+### Running Claude on Amazon Bedrock (AWS credits)
+
+New AWS accounts receive promotional credits that Bedrock accepts, so a demo
+can run on Claude without a card charge until they run out. (Google Cloud's
+free-trial credit does not cover Claude, so Vertex AI is not an alternative
+here.)
+
+1. Create an AWS account and open **Amazon Bedrock** in the `us-east-1`
+   region. Under **Billing → Credits**, check that the credits are there.
+2. In Bedrock, open **Model catalog**, pick the Claude model you want (Haiku
+   4.5 makes the credits last longest) and request access if asked. Anthropic
+   models ask for a short use-case form the first time.
+3. Create a **Bedrock API key** (Bedrock console → **API keys**). Alternatively,
+   create an IAM user with the `AmazonBedrockLimitedAccess` policy and an
+   access key pair.
+4. In Vercel (and `.env.local`), set:
+
+   ```
+   AI_PROVIDER=bedrock
+   BEDROCK_REGION=us-east-1
+   BEDROCK_API_KEY=<the Bedrock API key>
+   ANTHROPIC_MODEL=claude-haiku-4-5
+   ```
+
+   or `BEDROCK_ACCESS_KEY_ID` and `BEDROCK_SECRET_ACCESS_KEY` instead of the
+   API key. `ANTHROPIC_API_KEY` is not needed. The model name is written as on
+   the Claude API; the app adds Bedrock's `anthropic.` prefix itself.
+5. Redeploy.
+
+The variables deliberately avoid the `AWS_*` names: Vercel reserves them, and
+its functions already hold AWS credentials of their own that would otherwise
+be picked up by mistake.
+
+On Bedrock, server-side fallbacks are not available, so a declined request
+shows the usual error message instead of being retried on another model.
 
 ## Billing (optional)
 
