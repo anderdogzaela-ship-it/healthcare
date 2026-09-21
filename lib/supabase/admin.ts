@@ -11,9 +11,15 @@ import type { Database } from './database.types';
  * never expose the key to the browser.
  */
 export function createAdminClient() {
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // Supabase calls this the service_role key; newer projects also expose it as
+  // a "secret key". Either name works here.
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SECRET_KEY;
   if (!serviceKey) {
-    throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY: required by the automation endpoints.');
+    throw new Error(
+      'Missing SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_SECRET_KEY). ' +
+        'The public API, the automation endpoints and the webhook sender need it. ' +
+        'Copy it from Supabase → Project Settings → API.'
+    );
   }
 
   return createSupabaseClient<Database>(supabaseUrl(), serviceKey, {
