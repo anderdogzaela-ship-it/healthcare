@@ -23,6 +23,18 @@ const functionDeclarations = tools.map((tool) => ({
   parametersJsonSchema: tool.input_schema,
 }));
 
+/**
+ * Tried in order when the chosen model is overloaded (503), out of free quota
+ * (429) or retired for new accounts (404), which happens on the free tier.
+ */
+const FALLBACK_MODELS = ['gemini-3.5-flash', 'gemini-3-flash-preview'];
+const RETRYABLE = new Set([404, 429, 503]);
+
+function isRetryable(error: unknown): boolean {
+  const status = (error as { status?: number })?.status;
+  return typeof status === 'number' && RETRYABLE.has(status);
+}
+
 export interface GeminiTurn {
   model: string;
   system: string;
@@ -41,32 +53,52 @@ export async function answerWithGemini(turn: GeminiTurn): Promise<string> {
     parts: [{ text: row.content }],
   }));
 
+  const models = [turn.model, ...FALLBACK_MODELS.filter((model) => model !== turn.model)];
+  // Once a model answers, later rounds stay on it: the thought signatures it
+  // returned belong to that model.
+  let current = 0;
   let answer = '';
 
   for (let round = 0; round < turn.maxToolRounds; round++) {
-    const stream = await gemini().models.generateContentStream({
-      model: turn.model,
-      contents,
-      config: {
-        systemInstruction: turn.system,
-        maxOutputTokens: turn.maxTokens,
-        tools: [{ functionDeclarations }],
-      },
-    });
-
     // Every part is kept, not just the text: function calls carry a thought
     // signature that must be sent back unchanged with their results.
-    const parts: Part[] = [];
-    const calls: FunctionCall[] = [];
+    let parts: Part[] = [];
+    let calls: FunctionCall[] = [];
 
-    for await (const chunk of stream) {
-      for (const part of chunk.candidates?.[0]?.content?.parts ?? []) {
-        parts.push(part);
-        if (part.functionCall) calls.push(part.functionCall);
-        else if (part.text && !part.thought) {
-          answer += part.text;
-          turn.send(part.text);
+    for (let attempt = current; ; attempt++) {
+      parts = [];
+      calls = [];
+      const answeredBefore = answer.length;
+
+      try {
+        const stream = await gemini().models.generateContentStream({
+          model: models[attempt],
+          contents,
+          config: {
+            systemInstruction: turn.system,
+            maxOutputTokens: turn.maxTokens,
+            tools: [{ functionDeclarations }],
+          },
+        });
+
+        for await (const chunk of stream) {
+          for (const part of chunk.candidates?.[0]?.content?.parts ?? []) {
+            parts.push(part);
+            if (part.functionCall) calls.push(part.functionCall);
+            else if (part.text && !part.thought) {
+              answer += part.text;
+              turn.send(part.text);
+            }
+          }
         }
+        current = attempt;
+        break;
+      } catch (error) {
+        // Another model may answer, but only if this one has not started to:
+        // text already sent cannot be taken back.
+        const canRetry = isRetryable(error) && answer.length === answeredBefore && attempt + 1 < models.length;
+        if (!canRetry) throw error;
+        console.warn(`gemini ${models[attempt]} unavailable, trying ${models[attempt + 1]}`);
       }
     }
 

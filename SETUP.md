@@ -218,12 +218,16 @@ API instead of Claude. Its free tier covers the Flash models and needs no card.
    GEMINI_API_KEY=<the key>
    ```
 
-   `GEMINI_MODEL` is optional and defaults to `gemini-2.5-flash`.
+   `GEMINI_MODEL` is optional and defaults to `gemini-3.5-flash`.
 3. Redeploy.
 
 The same read-only tools, scoping and safety rules apply; the emergency check
 runs before any model is called, whichever provider is set. Two differences:
 
+- **Fallback.** Free-tier models are sometimes overloaded or retired for new
+  accounts. When the chosen model answers 503, 429 or 404, the next one is
+  tried (`gemini-3.5-flash`, then `gemini-3-flash-preview`) before any error is
+  shown.
 - **Limits.** The free tier allows a small number of requests per minute and
   per day, which suits a demo, not production. When it is used up, the
   assistant shows its usual error message.

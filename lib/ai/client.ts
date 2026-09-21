@@ -29,7 +29,7 @@ const BASE_MODEL = process.env.ANTHROPIC_MODEL || 'claude-opus-5';
  */
 export const MODEL =
   AI_PROVIDER === 'gemini'
-    ? process.env.GEMINI_MODEL || 'gemini-2.5-flash'
+    ? process.env.GEMINI_MODEL || 'gemini-3.5-flash'
     : AI_PROVIDER === 'bedrock' && !BASE_MODEL.startsWith('anthropic.') ? `anthropic.${BASE_MODEL}` : BASE_MODEL;
 
 const family = MODEL.replace(/^anthropic\./, '');
