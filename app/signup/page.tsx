@@ -4,7 +4,6 @@ import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { Heart, Mail, Lock, Eye, EyeOff, User, Activity, ShieldCheck, ArrowLeft, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { signUp, type AuthMessageKey } from '@/app/actions/auth';
 
 const features = [
@@ -103,7 +102,6 @@ export default function SignUpPage() {
           <ArrowLeft className="w-4 h-4" />
           HealthAI
         </Link>
-        <LanguageSwitcher className="absolute top-4 right-4" />
 
         <div className="w-full max-w-md">
           {/* Mobile logo */}
