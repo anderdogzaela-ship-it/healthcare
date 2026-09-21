@@ -128,7 +128,7 @@ export default function CaseStudy() {
 
       <main>
         {/* Hero */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-emerald-50 via-white to-white">
+        <section id="top" className="relative overflow-hidden bg-gradient-to-b from-emerald-50 via-white to-white scroll-mt-16">
           <div aria-hidden className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-emerald-200/40 blur-3xl animate-blob" />
           <div aria-hidden className="absolute top-40 -left-24 w-80 h-80 rounded-full bg-teal-200/40 blur-3xl animate-blob" />
           <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-14 lg:pt-24 lg:pb-20">
@@ -218,7 +218,7 @@ export default function CaseStudy() {
         </section>
 
         {/* What was built */}
-        <section className="py-16 lg:py-24 bg-gray-50">
+        <section id="built" className="py-16 lg:py-24 bg-gray-50 scroll-mt-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <Reveal className="max-w-2xl">
               <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight" style={heading}>{cs.builtTitle}</h2>
@@ -241,7 +241,7 @@ export default function CaseStudy() {
         </section>
 
         {/* Architecture */}
-        <section className="py-16 lg:py-24">
+        <section id="architecture" className="py-16 lg:py-24 scroll-mt-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <Reveal className="max-w-2xl">
               <h2 className="text-3xl lg:text-4xl font-extrabold text-gray-900 tracking-tight" style={heading}>{cs.architectureTitle}</h2>
@@ -330,7 +330,7 @@ export default function CaseStudy() {
         </section>
 
         {/* Call to action */}
-        <section className="py-16 lg:py-24">
+        <section id="contact" className="py-16 lg:py-24 scroll-mt-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <Reveal>
               <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-600 to-teal-600 p-8 sm:p-12 text-center shadow-2xl shadow-emerald-200">

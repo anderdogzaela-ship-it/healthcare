@@ -725,7 +725,6 @@ const en = {
         integrations: 'Integrations',
         api: 'API',
         about: 'About',
-        blog: 'Blog',
         contact: 'Contact',
         privacy: 'Privacy',
         terms: 'Terms',
@@ -827,6 +826,187 @@ const en = {
     ctaBody: 'Automations, WhatsApp bots, AI assistants, API integrations or a complete SaaS: send me a message on Workana with what you need.',
     ctaDemo: 'Try the live demo',
     note: 'Portfolio project. All names and data in the demo are fictitious.',
+  },
+  legal: {
+    back: 'Back to the site',
+    updated: 'Last updated: 21 September 2026',
+    demoNotice: 'HealthAI is a portfolio demonstration, not a medical service. Please do not enter real health information or real patient data.',
+    onThisPage: 'On this page',
+    privacy: {
+      metaTitle: 'Privacy policy — HealthAI',
+      title: 'Privacy policy',
+      intro: 'This page explains what HealthAI stores, why, who helps us run it, and the rights you have over your data.',
+      sections: [
+        {
+          id: 'who',
+          title: 'Who we are',
+          paragraphs: [
+            'HealthAI is a portfolio project built to show how a healthcare platform can work. It is not run by a clinic, a hospital or a health company, and it is not intended for real patients.',
+            'Questions about this policy can be sent to the developer through their Workana profile.',
+          ],
+        },
+        {
+          id: 'data',
+          title: 'What we collect',
+          paragraphs: [
+            'Account: your name, email address and password. The password is stored only in hashed form by our authentication provider; nobody can read it.',
+            'Profile and preferences: phone number, date of birth, timezone, language, units and goals, if you provide them.',
+            'Health records you log: vitals, sleep, activity, symptoms and notes, and your conversations with the assistant.',
+            'Clinic data: when you use the clinic features, the patients, notes and appointments that you or your colleagues enter.',
+            'Technical data: the cookies described below, and when each API key was last used.',
+          ],
+        },
+        {
+          id: 'use',
+          title: 'How we use it',
+          paragraphs: [
+            'Only to provide the features you use: your dashboard and history, answers from the assistant, appointment reminders your clinic turns on, and the integrations your clinic sets up.',
+            'We do not sell data, show advertising, or build profiles for marketing.',
+          ],
+        },
+        {
+          id: 'basis',
+          title: 'Legal basis',
+          paragraphs: [
+            'Health information is sensitive personal data under Brazil’s LGPD (article 11) and the European GDPR (article 9). We process it on the explicit consent you give when you create an account, and you can withdraw that consent at any time by deleting your account.',
+            'Patient records entered by a clinic belong to that clinic, which decides how they are used. For those records, HealthAI only processes data on the clinic’s behalf.',
+          ],
+        },
+        {
+          id: 'ai',
+          title: 'The AI assistant',
+          paragraphs: [
+            'When you ask the assistant a question, your message and the records it needs to answer (for example, last week’s sleep) are sent to the AI provider configured for this site, currently Google Gemini or Anthropic Claude. Only your own records are ever sent.',
+            'Messages that mention a possible emergency are never sent to any AI provider; you are pointed to emergency care instead.',
+            'On a provider’s free tier, the provider may use conversations to improve its products. This is one more reason not to enter real health information in this demo.',
+          ],
+        },
+        {
+          id: 'processors',
+          title: 'Service providers',
+          paragraphs: [
+            'Supabase stores the database and handles sign-in. Vercel hosts the application. The AI provider generates the assistant’s answers. Stripe processes payments, when subscriptions are enabled. A messaging provider, connected through n8n, sends WhatsApp reminders, when a clinic enables them.',
+            'These providers may process data outside your country, under their own security and privacy commitments.',
+          ],
+        },
+        {
+          id: 'security',
+          title: 'Security',
+          paragraphs: [
+            'Every table in the database is protected by row-level security, so each person and each clinic can only read their own records. Connections use HTTPS.',
+            'API keys are stored only as hashes, webhooks are signed so they can be verified, and the keys for the AI provider, payments and database stay on the server and never reach your browser.',
+            'No system is perfectly secure. If we learn of an incident affecting your data, we will tell you and the authorities as the law requires.',
+          ],
+        },
+        {
+          id: 'retention',
+          title: 'How long we keep it',
+          paragraphs: [
+            'For as long as your account exists. When you delete your account, your records are deleted with it; copies in our providers’ backups expire on their own schedules.',
+          ],
+        },
+        {
+          id: 'rights',
+          title: 'Your rights',
+          paragraphs: [
+            'You can access and download everything your account holds (Settings → Your data), correct your details (Settings → Profile), and delete your account and its data (Settings → Delete account).',
+            'You can also withdraw consent, ask questions about how your data is handled, and complain to your data protection authority, which in Brazil is the ANPD.',
+          ],
+        },
+        {
+          id: 'cookies',
+          title: 'Cookies',
+          paragraphs: [
+            'We only use cookies the site needs to work: one keeps you signed in, one remembers your language, and one remembers which clinic you are working in. There are no analytics or advertising cookies.',
+          ],
+        },
+        {
+          id: 'changes',
+          title: 'Changes to this policy',
+          paragraphs: [
+            'If this policy changes, this page will be updated and the date at the top will change with it.',
+          ],
+        },
+      ],
+    },
+    terms: {
+      metaTitle: 'Terms of use — HealthAI',
+      title: 'Terms of use',
+      intro: 'By creating an account or using HealthAI you agree to these terms. They are short on purpose.',
+      sections: [
+        {
+          id: 'service',
+          title: 'About this service',
+          paragraphs: [
+            'HealthAI is a free portfolio demonstration. Features may change, and demo data may be reset, without notice.',
+          ],
+        },
+        {
+          id: 'medical',
+          title: 'Not medical advice',
+          paragraphs: [
+            'HealthAI and its assistant give general information only. They do not diagnose, treat or replace a health professional, and nothing here is a recommendation about medication.',
+            'In an emergency, call your local emergency number or go to the nearest emergency department.',
+          ],
+        },
+        {
+          id: 'account',
+          title: 'Your account',
+          paragraphs: [
+            'Give accurate information, keep your password to yourself, and use one account per person. You are responsible for what happens in your account.',
+          ],
+        },
+        {
+          id: 'use',
+          title: 'Acceptable use',
+          paragraphs: [
+            'Do not enter real patient data without a lawful basis, attempt to access other people’s data, disrupt the service, get around rate limits, or use it for anything unlawful.',
+          ],
+        },
+        {
+          id: 'clinics',
+          title: 'Clinics and their patients',
+          paragraphs: [
+            'A clinic that records patients is responsible for having a lawful basis and the patients’ consent for the data it enters and the messages it sends them, including WhatsApp reminders.',
+          ],
+        },
+        {
+          id: 'api',
+          title: 'API and integrations',
+          paragraphs: [
+            'Keep API keys and webhook secrets confidential. Keys that are misused or exceed the rate limits may be revoked.',
+          ],
+        },
+        {
+          id: 'warranty',
+          title: 'No warranty',
+          paragraphs: [
+            'The service is provided as it is, without guarantees of availability, accuracy or that data will be preserved. Do not rely on it for decisions about care.',
+          ],
+        },
+        {
+          id: 'liability',
+          title: 'Limitation of liability',
+          paragraphs: [
+            'To the extent the law allows, the developer is not liable for indirect losses, or for losses resulting from use of the demo, from information shown in it, or from data entered into it.',
+          ],
+        },
+        {
+          id: 'ending',
+          title: 'Ending your use',
+          paragraphs: [
+            'You can delete your account at any time in Settings. Accounts that break these terms may be suspended.',
+          ],
+        },
+        {
+          id: 'changes',
+          title: 'Changes and contact',
+          paragraphs: [
+            'If these terms change, this page will be updated with a new date. Questions can be sent to the developer through their Workana profile.',
+          ],
+        },
+      ],
+    },
   },
 };
 

@@ -58,6 +58,42 @@ test.describe('case study', () => {
   });
 });
 
+test.describe('legal pages', () => {
+  test('the footer leads to the privacy policy and the terms', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('contentinfo').getByRole('link', { name: 'Privacy' }).click();
+    await expect(page).toHaveURL(/\/privacy$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Privacy policy' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /The AI assistant/ })).toBeVisible();
+
+    await page.getByRole('contentinfo').getByRole('link', { name: 'Terms' }).click();
+    await expect(page).toHaveURL(/\/terms$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Terms of use' })).toBeVisible();
+  });
+
+  test('no footer link is a placeholder', async ({ page }) => {
+    await page.goto('/');
+    const hrefs = await page.getByRole('contentinfo').getByRole('link').evaluateAll(
+      (links) => links.map((link) => link.getAttribute('href'))
+    );
+    expect(hrefs.length).toBeGreaterThan(5);
+    expect(hrefs.filter((href) => !href || href === '#')).toEqual([]);
+  });
+
+  test('the sign-up consent links to the real documents', async ({ page }) => {
+    await page.goto('/signup');
+    await expect(page.getByRole('link', { name: 'Terms of Service' })).toHaveAttribute('href', '/terms');
+    await expect(page.getByRole('link', { name: 'Privacy Policy' })).toHaveAttribute('href', '/privacy');
+  });
+
+  test('the privacy policy is translated into Spanish', async ({ page, context }) => {
+    await context.addCookies([{ name: 'locale', value: 'es', url: 'http://localhost' }]);
+    await page.goto('/privacy');
+    await expect(page.getByRole('heading', { level: 1, name: 'Política de privacidad' })).toBeVisible();
+    await expect(page).toHaveTitle(/Política de privacidad/);
+  });
+});
+
 test.describe('languages', () => {
   test('cookie selects Portuguese', async ({ page, context }) => {
     await context.addCookies([

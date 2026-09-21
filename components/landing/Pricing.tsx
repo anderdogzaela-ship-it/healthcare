@@ -204,10 +204,35 @@ export function Footer() {
   const { m, fmt } = useI18n();
   const year = new Date().getFullYear();
 
+  // Every link goes somewhere real; the footer is shared by the landing page,
+  // the case study and the legal pages, so section links are absolute.
+  const links = m.landing.footer.links;
   const columns = [
-    { title: m.landing.footer.product, links: [m.landing.footer.links.features, m.landing.footer.links.pricing, m.landing.footer.links.integrations, m.landing.footer.links.api] },
-    { title: m.landing.footer.company, links: [m.landing.nav.caseStudy, m.landing.footer.links.about, m.landing.footer.links.blog, m.landing.footer.links.contact] },
-    { title: m.landing.footer.legal, links: [m.landing.footer.links.privacy, m.landing.footer.links.terms, m.landing.footer.links.security] },
+    {
+      title: m.landing.footer.product,
+      links: [
+        { label: links.features, href: '/#features' },
+        { label: links.pricing, href: '/#pricing' },
+        { label: links.integrations, href: '/case-study#built' },
+        { label: links.api, href: '/case-study#architecture' },
+      ],
+    },
+    {
+      title: m.landing.footer.company,
+      links: [
+        { label: m.landing.nav.caseStudy, href: '/case-study' },
+        { label: links.about, href: '/case-study#top' },
+        { label: links.contact, href: '/case-study#contact' },
+      ],
+    },
+    {
+      title: m.landing.footer.legal,
+      links: [
+        { label: links.privacy, href: '/privacy' },
+        { label: links.terms, href: '/terms' },
+        { label: links.security, href: '/privacy#security' },
+      ],
+    },
   ];
 
   return (
@@ -232,12 +257,9 @@ export function Footer() {
               <h3 className="text-sm font-bold text-white" style={{ fontFamily: 'Nunito, sans-serif' }}>{column.title}</h3>
               <ul className="mt-4 space-y-2.5">
                 {column.links.map((link) => (
-                  <li key={link}>
-                    <a
-                      href={link === m.landing.nav.caseStudy ? '/case-study' : '#'}
-                      className="text-sm hover:text-emerald-400 transition-colors"
-                    >
-                      {link}
+                  <li key={link.href}>
+                    <a href={link.href} className="text-sm hover:text-emerald-400 transition-colors">
+                      {link.label}
                     </a>
                   </li>
                 ))}

@@ -232,8 +232,8 @@ export default function SignUpPage() {
                 />
                 <span className="text-xs text-gray-500 leading-relaxed">
                   {rich(m.auth.consentLabel, {
-                    terms: <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">{m.signup.termsLink}</a>,
-                    privacy: <a href="#" className="text-emerald-600 hover:text-emerald-700 font-medium">{m.signup.privacyLink}</a>,
+                    terms: <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:text-emerald-700 font-medium">{m.signup.termsLink}</a>,
+                    privacy: <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:text-emerald-700 font-medium">{m.signup.privacyLink}</a>,
                   })}
                 </span>
               </label>
