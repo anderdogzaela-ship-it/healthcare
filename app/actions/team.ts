@@ -7,7 +7,7 @@ import { createClient, requireUser } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { siteUrl } from '@/lib/supabase/env';
 import { getClinicContext } from '@/lib/data/clinic';
-import { getClinicUsage } from '@/lib/billing/limits';
+import { canAddTeamMember } from '@/lib/billing/limits';
 
 export type TeamResult =
   | { status: 'ok' }
@@ -43,10 +43,9 @@ export async function inviteStaff(formData: FormData): Promise<TeamResult> {
   });
   if (!parsed.success) return { status: 'error', reason: 'invalid' };
 
-  // Seats are part of the plan, so an invitation counts against the limit.
-  const usage = await getClinicUsage(context.clinic.id);
-  const seats = usage.plan.limits.teamMembers;
-  if (seats !== null && usage.teamMembers >= seats) return { status: 'error', reason: 'limit' };
+  // Seats are part of the plan, so an invitation counts against the limit
+  // (when billing is configured; see limitsEnforced).
+  if (!(await canAddTeamMember(context.clinic.id))) return { status: 'error', reason: 'limit' };
 
   const token = randomBytes(24).toString('base64url');
   const supabase = createClient();

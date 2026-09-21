@@ -193,9 +193,14 @@ the starter plan and the billing page says so. To turn subscriptions on:
    `STRIPE_WEBHOOK_SECRET`. Locally: `stripe listen --forward-to localhost:3000/api/stripe/webhook`.
 
 Stripe owns the billing state; the `subscriptions` table mirrors it so the app
-can check a plan without calling Stripe on every request. **Plan limits are
-enforced**, not just displayed: adding a patient beyond the plan's limit is
-refused with an upgrade prompt.
+can check a plan without calling Stripe on every request. With Stripe
+configured, **plan limits are enforced**, not just displayed: adding a patient
+or inviting a colleague beyond the plan's limit is refused with an upgrade
+prompt.
+
+Without Stripe, limits are **not** enforced. Nobody could upgrade in that case,
+so enforcing them would only lock people out of features — a dead end in a
+public demo. The billing page says so, and shows usage as unlimited.
 
 ## Not built yet
 

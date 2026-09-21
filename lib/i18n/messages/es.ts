@@ -159,7 +159,7 @@ const es: Messages = {
     manage: 'Administrar facturación',
     opening: 'Abriendo...',
     contactSales: 'Hablar con ventas',
-    notConfigured: 'La facturación no está configurada en este entorno, así que los planes no se pueden cambiar aquí.',
+    notConfigured: 'La facturación no está configurada en este entorno: los planes no se pueden cambiar aquí y sus límites no se aplican.',
     ownerOnly: 'Solo el propietario de la clínica puede cambiar el plan.',
     error: 'Algo salió mal. Inténtalo de nuevo.',
     checkoutSuccess: 'Suscripción actualizada. ¡Gracias!',

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { planFor, type Plan } from './plans';
+import { billingConfigured } from './stripe';
 
 export interface ClinicUsage {
   plan: Plan;
@@ -47,9 +48,30 @@ export async function getClinicUsage(clinicId: string): Promise<ClinicUsage> {
   };
 }
 
+/**
+ * Plan limits only apply when billing is configured.
+ *
+ * Without Stripe nobody can upgrade, so enforcing limits would lock people out
+ * of features with no way forward — a dead end in a demo, or in a self-hosted
+ * install that never sells plans. With Stripe configured the limits apply as
+ * advertised.
+ */
+export function limitsEnforced(): boolean {
+  return billingConfigured();
+}
+
 /** Whether the clinic may add another patient on its current plan. */
 export async function canAddPatient(clinicId: string): Promise<boolean> {
+  if (!limitsEnforced()) return true;
   const usage = await getClinicUsage(clinicId);
   const limit = usage.plan.limits.patients;
   return limit === null || usage.patients < limit;
+}
+
+/** Whether the clinic has a seat left for another team member. */
+export async function canAddTeamMember(clinicId: string): Promise<boolean> {
+  if (!limitsEnforced()) return true;
+  const usage = await getClinicUsage(clinicId);
+  const seats = usage.plan.limits.teamMembers;
+  return seats === null || usage.teamMembers < seats;
 }

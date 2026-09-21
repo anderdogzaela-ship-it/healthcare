@@ -159,7 +159,7 @@ const pt: Messages = {
     manage: 'Gerenciar cobrança',
     opening: 'Abrindo...',
     contactSales: 'Falar com vendas',
-    notConfigured: 'A cobrança não está configurada neste ambiente, então os planos não podem ser alterados aqui.',
+    notConfigured: 'A cobrança não está configurada neste ambiente: os planos não podem ser alterados aqui e os limites não são aplicados.',
     ownerOnly: 'Só o proprietário da clínica pode mudar o plano.',
     error: 'Algo deu errado. Tente novamente.',
     checkoutSuccess: 'Assinatura atualizada. Obrigado!',

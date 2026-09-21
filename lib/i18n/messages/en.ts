@@ -158,7 +158,7 @@ const en = {
     manage: 'Manage billing',
     opening: 'Opening...',
     contactSales: 'Talk to sales',
-    notConfigured: 'Billing is not configured in this environment, so plans cannot be changed here.',
+    notConfigured: 'Billing is not configured in this environment, so plans cannot be changed here and plan limits are not enforced.',
     ownerOnly: 'Only the clinic owner can change the plan.',
     error: 'Something went wrong. Please try again.',
     checkoutSuccess: 'Subscription updated. Thank you!',
