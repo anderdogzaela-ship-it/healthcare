@@ -6,7 +6,19 @@ import { systemPrompt } from '@/lib/ai/prompt';
 import { runTool, tools } from '@/lib/ai/tools';
 import { EMERGENCY_REPLY, hasRedFlag } from '@/lib/ai/safety';
 
-const MODEL = 'claude-opus-5';
+/**
+ * Claude Opus 5 by default. Set ANTHROPIC_MODEL to use another model, for
+ * example claude-haiku-4-5 to make demo credits last several times longer.
+ */
+const MODEL = process.env.ANTHROPIC_MODEL || 'claude-opus-5';
+
+/**
+ * Request options differ by model family, and sending one a model does not
+ * support is a 400: Haiku 4.5 rejects `effort`, and server-side fallbacks are
+ * offered for Opus 5 and the Fable models.
+ */
+const SUPPORTS_EFFORT = !MODEL.startsWith('claude-haiku');
+const SUPPORTS_FALLBACKS = MODEL === 'claude-opus-5' || MODEL.startsWith('claude-fable');
 /** Chat answers are deliberately short, so the cap stays low. */
 const MAX_TOKENS = 4096;
 /** Stops a runaway tool loop. Four rounds is plenty for "compare X and Y". */
@@ -153,10 +165,12 @@ export async function POST(request: Request) {
             max_tokens: MAX_TOKENS,
             // Opus 5 can decline a request; "default" re-runs it on a fallback
             // model instead of returning nothing.
-            betas: ['server-side-fallback-2026-07-01'],
-            fallbacks: 'default',
+            ...(SUPPORTS_FALLBACKS && {
+              betas: ['server-side-fallback-2026-07-01'],
+              fallbacks: 'default' as const,
+            }),
             // Chat does not need the deepest reasoning; medium keeps it quick.
-            output_config: { effort: 'medium' },
+            ...(SUPPORTS_EFFORT && { output_config: { effort: 'medium' as const } }),
             system,
             messages,
             tools: toolParams,

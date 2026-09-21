@@ -188,8 +188,20 @@ Three safeguards:
   no reassurance about symptoms, and abnormal readings are never softened.
 - **Rate limit.** 40 messages per user per hour, checked before any spend.
 
-Server-side fallbacks are enabled, so if the model declines a request it is
-retried on a fallback model instead of failing. Cost scales with use: each
+Server-side fallbacks are enabled on Opus 5, so if the model declines a
+request it is retried on a fallback model instead of failing.
+
+**Choosing a model.** `ANTHROPIC_MODEL` switches the model without code
+changes; the default is `claude-opus-5`. Rough cost per question, assuming about
+4K input and 1K output tokens including one tool call:
+
+| Model | Approx. per question | Answers per US$ 5 |
+|---|---|---|
+| `claude-opus-5` | ~US$ 0.05 | ~100 |
+| `claude-sonnet-5` | ~US$ 0.02 | ~250 |
+| `claude-haiku-4-5` | ~US$ 0.006 | ~800 |
+
+These are estimates; the Anthropic console shows the real usage. Cost scales with use: each
 answer is one or more Claude calls, so watch usage in the Anthropic console.
 
 ## Billing (optional)
