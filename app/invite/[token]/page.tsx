@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { CheckCircle2, XCircle } from 'lucide-react';
 import { getUser } from '@/lib/supabase/server';
@@ -14,7 +13,7 @@ export default async function InvitePage({ params }: { params: { token: string }
   const user = await getUser();
   if (!user) redirect(`/login?next=${encodeURIComponent(`/invite/${params.token}`)}`);
 
-  const result = await acceptInvitation(params.token);
+  const { result, clinicId } = await acceptInvitation(params.token);
   const m = messages[getLocale()];
   const accepted = result === 'accepted' || result === 'already';
 
@@ -27,14 +26,17 @@ export default async function InvitePage({ params }: { params: { token: string }
 
         <p className="mt-5 text-gray-700">{m.team.accept[result]}</p>
 
+        {/* Through the switch route, so the clinic they just joined is the one
+            that opens even if they already run a clinic of their own. A plain
+            link, not next/link: prefetching would select the clinic on hover. */}
         {accepted && (
-          <Link
-            href="/clinic"
+          <a
+            href={clinicId ? `/api/clinic/switch?id=${clinicId}&next=/clinic` : '/clinic'}
             className="mt-6 inline-block px-6 py-3 rounded-2xl text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-emerald-500 shadow-lg shadow-emerald-200 hover:shadow-xl transition-all"
             style={{ fontFamily: 'Nunito, sans-serif' }}
           >
             {m.team.accept.open}
-          </Link>
+          </a>
         )}
       </div>
     </div>

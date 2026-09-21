@@ -91,6 +91,14 @@ test.describe('authentication gates', () => {
     expect(response.headers()['location']).toContain('/auth/confirm?token_hash=xyz&type=email');
   });
 
+  test('switching clinic without a session sends you to sign in', async ({ request }) => {
+    const response = await request.get('/api/clinic/switch?id=some-clinic&next=/clinic', { maxRedirects: 0 });
+    expect(response.status()).toBe(307);
+    expect(response.headers()['location']).toContain('/login?next=%2Fclinic');
+    // Nothing is remembered for a visitor who is not signed in.
+    expect(response.headers()['set-cookie'] ?? '').not.toContain('active_clinic');
+  });
+
   test('the reset-password page requires the session a reset link creates', async ({ page }) => {
     await page.goto('/reset-password');
     await expect(page).toHaveURL(/\/login\?next=%2Freset-password/);
