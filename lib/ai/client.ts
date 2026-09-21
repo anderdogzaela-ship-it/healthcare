@@ -14,8 +14,11 @@ export type AiProvider = 'anthropic' | 'bedrock' | 'gemini';
 
 const PROVIDERS: readonly AiProvider[] = ['anthropic', 'bedrock', 'gemini'];
 
-export const AI_PROVIDER: AiProvider = PROVIDERS.includes(process.env.AI_PROVIDER as AiProvider)
-  ? (process.env.AI_PROVIDER as AiProvider)
+/** Forgiving about case, quotes and stray spaces pasted into the dashboard. */
+const requestedProvider = (process.env.AI_PROVIDER ?? '').trim().replace(/^["']|["']$/g, '').toLowerCase();
+
+export const AI_PROVIDER: AiProvider = PROVIDERS.includes(requestedProvider as AiProvider)
+  ? (requestedProvider as AiProvider)
   : 'anthropic';
 
 const BASE_MODEL = process.env.ANTHROPIC_MODEL || 'claude-opus-5';
