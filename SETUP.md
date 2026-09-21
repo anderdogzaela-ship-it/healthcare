@@ -169,6 +169,8 @@ supabase/migrations/    SQL schema
 - A public API with per-clinic keys and signed webhooks, documented in
   [automations/api/](automations/api/)
 - Data export and account deletion, as the LGPD and GDPR require
+- Patient list export to CSV for clinic owners, with localized headers and
+  cells escaped so spreadsheets never run a formula typed into a record
 - Full interface in English, Spanish and Portuguese
 - **Sample data for demos**: Settings → *Sample data* fills the account with
   30 days of fictitious vitals, sleep and activity, plus sample patients,
@@ -312,7 +314,6 @@ your plan to add more."
 - **Sending invitation emails**: the invitation link is generated and shown to
   the owner to share; no email is sent yet.
 - **Per-scope API permissions**: a key can do everything its clinic can.
-- **Clinic-level export**: owners cannot yet download the whole patient list.
 
 ## Working with health data
 

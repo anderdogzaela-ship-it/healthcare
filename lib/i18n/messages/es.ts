@@ -32,6 +32,11 @@ const es: Messages = {
     settings: 'Configuración',
   },
   clinic: {
+    exportCsv: 'Exportar CSV',
+    csv: {
+      name: 'Nombre', email: 'Correo', phone: 'Teléfono', status: 'Estado', dateOfBirth: 'Fecha de nacimiento',
+      language: 'Idioma', lastVisit: 'Última visita', notes: 'Notas', createdAt: 'Agregado el',
+    },
     title: 'Clínica',
     subtitle: 'Tus pacientes y cómo van sus consultas',
     onboarding: {

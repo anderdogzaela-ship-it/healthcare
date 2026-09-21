@@ -31,6 +31,11 @@ const en = {
     settings: 'Settings',
   },
   clinic: {
+    exportCsv: 'Export CSV',
+    csv: {
+      name: 'Name', email: 'Email', phone: 'Phone', status: 'Status', dateOfBirth: 'Date of birth',
+      language: 'Language', lastVisit: 'Last visit', notes: 'Notes', createdAt: 'Added on',
+    },
     title: 'Clinic',
     subtitle: 'Your patients and how their visits are going',
     onboarding: {
