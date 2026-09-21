@@ -229,6 +229,18 @@ const pt: Messages = {
     resetSent: 'Se esse e-mail tiver uma conta, o link de redefinição está a caminho.',
     consentRequired: 'Aceite os termos para criar sua conta.',
     consentLabel: 'Concordo com os {terms} e com a {privacy}, incluindo o tratamento dos meus dados de saúde.',
+    passwordUpdated: 'Sua senha foi alterada.',
+    resendConfirmation: 'Reenviar o e-mail de confirmação',
+    confirmationResent: 'Se este endereço estiver aguardando confirmação, um novo link está a caminho.',
+  },
+  resetPassword: {
+    title: 'Escolha uma nova senha',
+    subtitle: 'Digite uma nova senha para sua conta.',
+    newPassword: 'Nova senha',
+    confirmPassword: 'Confirmar nova senha',
+    submit: 'Atualizar senha',
+    saving: 'Atualizando...',
+    goToDashboard: 'Ir para o painel',
   },
   login: {
     liveOverview: 'Visão geral da saúde em tempo real',

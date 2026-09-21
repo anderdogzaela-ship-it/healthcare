@@ -229,6 +229,18 @@ const es: Messages = {
     resetSent: 'Si ese correo tiene una cuenta, el enlace para restablecer ya está en camino.',
     consentRequired: 'Acepta los términos para crear tu cuenta.',
     consentLabel: 'Acepto los {terms} y la {privacy}, incluido el tratamiento de mis datos de salud.',
+    passwordUpdated: 'Tu contraseña fue cambiada.',
+    resendConfirmation: 'Enviar de nuevo el correo de confirmación',
+    confirmationResent: 'Si esta dirección está pendiente de confirmación, ya va en camino un nuevo enlace.',
+  },
+  resetPassword: {
+    title: 'Elige una nueva contraseña',
+    subtitle: 'Escribe una nueva contraseña para tu cuenta.',
+    newPassword: 'Nueva contraseña',
+    confirmPassword: 'Confirmar nueva contraseña',
+    submit: 'Actualizar contraseña',
+    saving: 'Actualizando...',
+    goToDashboard: 'Ir al panel',
   },
   login: {
     liveOverview: 'Resumen de salud en vivo',

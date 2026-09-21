@@ -3,7 +3,9 @@ import { createServerClient } from '@supabase/ssr';
 import { supabaseAnonKey, supabaseUrl } from './env';
 
 /** Routes that require a signed-in user. */
-const PROTECTED = ['/dashboard', '/health', '/appointments', '/clinic', '/chat', '/activity', '/settings'];
+const PROTECTED = [
+  '/dashboard', '/health', '/appointments', '/clinic', '/chat', '/activity', '/settings', '/reset-password',
+];
 /** Auth pages a signed-in user has no reason to see. */
 const AUTH_PAGES = ['/login', '/signup'];
 
@@ -13,6 +15,17 @@ const AUTH_PAGES = ['/login', '/signup'];
  * layout and Server Action checks the user again on the server.
  */
 export async function updateSession(request: NextRequest) {
+  // When an email link's redirect is not on Supabase's allow list, Supabase
+  // sends the user to the project's Site URL instead, with the code still
+  // attached. Forward those to the handlers rather than showing the landing
+  // page to someone who is not actually signed in.
+  const incoming = request.nextUrl;
+  if (incoming.pathname === '/' && (incoming.searchParams.has('code') || incoming.searchParams.has('token_hash'))) {
+    const url = incoming.clone();
+    url.pathname = incoming.searchParams.has('token_hash') ? '/auth/confirm' : '/auth/callback';
+    return NextResponse.redirect(url);
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(supabaseUrl(), supabaseAnonKey(), {
