@@ -5,7 +5,9 @@ import { localDate } from '@/lib/data/health';
 import { systemPrompt } from '@/lib/ai/prompt';
 import { runTool, tools } from '@/lib/ai/tools';
 import { EMERGENCY_REPLY, hasRedFlag } from '@/lib/ai/safety';
+import { answerWithGemini } from '@/lib/ai/gemini';
 import {
+  AI_PROVIDER,
   MODEL,
   SUPPORTS_EAGER_TOOL_INPUT,
   SUPPORTS_EFFORT,
@@ -140,7 +142,20 @@ export async function POST(request: Request) {
       let answer = '';
 
       try {
-        for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+        if (AI_PROVIDER === 'gemini') {
+          answer = await answerWithGemini({
+            model: MODEL,
+            system: system.map((block) => block.text).join('\n\n'),
+            history: (history ?? []).map((row) => ({
+              role: row.role === 'ai' ? ('assistant' as const) : ('user' as const),
+              content: row.content,
+            })),
+            userId: user.id,
+            maxTokens: MAX_TOKENS,
+            maxToolRounds: MAX_TOOL_ROUNDS,
+            send,
+          });
+        } else for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
           const turn = claude().beta.messages.stream({
             model: MODEL,
             max_tokens: MAX_TOKENS,

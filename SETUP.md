@@ -204,6 +204,33 @@ changes; the default is `claude-opus-5`. Rough cost per question, assuming about
 These are estimates; the Anthropic console shows the real usage. Cost scales with use: each
 answer is one or more Claude calls, so watch usage in the Anthropic console.
 
+### Running on Google Gemini (free tier, no card)
+
+For demos without any payment method, the assistant can use Google's Gemini
+API instead of Claude. Its free tier covers the Flash models and needs no card.
+
+1. Open [Google AI Studio → API Keys](https://aistudio.google.com/apikey) and
+   create a key. "Set up billing" is not needed for the free tier.
+2. In Vercel (and `.env.local`), set:
+
+   ```
+   AI_PROVIDER=gemini
+   GEMINI_API_KEY=<the key>
+   ```
+
+   `GEMINI_MODEL` is optional and defaults to `gemini-2.5-flash`.
+3. Redeploy.
+
+The same read-only tools, scoping and safety rules apply; the emergency check
+runs before any model is called, whichever provider is set. Two differences:
+
+- **Limits.** The free tier allows a small number of requests per minute and
+  per day, which suits a demo, not production. When it is used up, the
+  assistant shows its usual error message.
+- **Data use.** On the free tier Google may use prompts and answers to improve
+  its products. Fine for the synthetic demo data; do not use it with real
+  patients. A paid Gemini key or Claude does not have this condition.
+
 ### Running Claude on Amazon Bedrock (AWS credits)
 
 New AWS accounts receive promotional credits that Bedrock accepts, so a demo

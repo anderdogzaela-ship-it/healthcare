@@ -7,16 +7,27 @@ import { AnthropicBedrockMantle } from '@anthropic-ai/bedrock-sdk';
  * - `anthropic` (default): the Claude API, with ANTHROPIC_API_KEY.
  * - `bedrock`: Amazon Bedrock, which lets new AWS accounts pay with their
  *   promotional credits.
+ * - `gemini`: Google's Gemini API, with GEMINI_API_KEY. Its free tier needs
+ *   no card, which suits demos. See lib/ai/gemini.ts.
  */
-export type AiProvider = 'anthropic' | 'bedrock';
+export type AiProvider = 'anthropic' | 'bedrock' | 'gemini';
 
-export const AI_PROVIDER: AiProvider = process.env.AI_PROVIDER === 'bedrock' ? 'bedrock' : 'anthropic';
+const PROVIDERS: readonly AiProvider[] = ['anthropic', 'bedrock', 'gemini'];
+
+export const AI_PROVIDER: AiProvider = PROVIDERS.includes(process.env.AI_PROVIDER as AiProvider)
+  ? (process.env.AI_PROVIDER as AiProvider)
+  : 'anthropic';
 
 const BASE_MODEL = process.env.ANTHROPIC_MODEL || 'claude-opus-5';
 
-/** Bedrock names the same models with an `anthropic.` prefix. */
+/**
+ * The model to call. Bedrock names the Claude models with an `anthropic.`
+ * prefix; Gemini has its own models, chosen with GEMINI_MODEL.
+ */
 export const MODEL =
-  AI_PROVIDER === 'bedrock' && !BASE_MODEL.startsWith('anthropic.') ? `anthropic.${BASE_MODEL}` : BASE_MODEL;
+  AI_PROVIDER === 'gemini'
+    ? process.env.GEMINI_MODEL || 'gemini-2.5-flash'
+    : AI_PROVIDER === 'bedrock' && !BASE_MODEL.startsWith('anthropic.') ? `anthropic.${BASE_MODEL}` : BASE_MODEL;
 
 const family = MODEL.replace(/^anthropic\./, '');
 
@@ -43,6 +54,7 @@ const bedrockSecretKey = () => process.env.BEDROCK_SECRET_ACCESS_KEY;
 
 /** Whether the chosen provider has the credentials it needs. */
 export function aiConfigured(): boolean {
+  if (AI_PROVIDER === 'gemini') return Boolean(process.env.GEMINI_API_KEY);
   if (AI_PROVIDER === 'bedrock') {
     return Boolean(bedrockApiKey() || (bedrockAccessKey() && bedrockSecretKey()));
   }
