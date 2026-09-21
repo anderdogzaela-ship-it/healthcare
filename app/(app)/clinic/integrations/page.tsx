@@ -20,7 +20,8 @@ export default async function IntegrationsPage() {
   const [{ data: keyRows }, { data: webhookRows }, { data: deliveryRows }] = await Promise.all([
     supabase
       .from('api_keys')
-      .select('id, name, prefix, last_used_at, revoked_at, created_at')
+      // All columns: keys created before the scopes migration have no scope.
+      .select('*')
       .eq('clinic_id', clinic.id)
       .order('created_at', { ascending: false }),
     supabase
@@ -40,6 +41,7 @@ export default async function IntegrationsPage() {
     id: row.id,
     name: row.name,
     prefix: row.prefix,
+    scope: row.scope === 'read' ? 'read' : 'write',
     lastUsedAt: row.last_used_at,
     revokedAt: row.revoked_at,
     createdAt: row.created_at,

@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  Users, CalendarCheck, CalendarX2, UserPlus, Search,
+  Users, CalendarCheck, CalendarX2, UserPlus, Search, Download,
   ChevronRight, AlertCircle, Phone, Mail
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
@@ -205,6 +205,18 @@ export default function ClinicDashboard({
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-5 border-b border-gray-100 flex items-center justify-between gap-4">
           <h2 className="font-bold text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>{m.clinic.patients}</h2>
+          <div className="flex items-center gap-2 max-w-sm w-full justify-end">
+          {/* The full roster is personal data: only the owner may download it. */}
+          {clinic.role === 'owner' && (
+            <a
+              href="/api/clinic/patients/export"
+              download
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold text-gray-700 border border-gray-200 hover:border-emerald-300 hover:text-emerald-700 transition-all flex-shrink-0"
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">{m.clinic.exportCsv}</span>
+            </a>
+          )}
           <form onSubmit={runSearch} className="relative max-w-xs w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -216,6 +228,7 @@ export default function ClinicDashboard({
               className="w-full pl-9 pr-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
             />
           </form>
+          </div>
         </div>
 
         {patients.length === 0 ? (

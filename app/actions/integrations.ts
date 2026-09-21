@@ -26,6 +26,7 @@ export async function createApiKey(formData: FormData): Promise<IntegrationResul
   if (!context) return { status: 'error', reason: 'forbidden' };
 
   const name = String(formData.get('name') ?? '').trim().slice(0, 60);
+  const scope = formData.get('scope') === 'read' ? 'read' : 'write';
   const key = generateApiKey();
 
   const supabase = createClient();
@@ -35,6 +36,9 @@ export async function createApiKey(formData: FormData): Promise<IntegrationResul
     prefix: key.prefix,
     key_hash: key.hash,
     created_by: context.user.id,
+    // Sent only when it differs from the column default, so full-access keys
+    // can still be created on a database without the scopes migration.
+    ...(scope === 'read' && { scope }),
   });
 
   if (error) return { status: 'error', reason: 'failed' };

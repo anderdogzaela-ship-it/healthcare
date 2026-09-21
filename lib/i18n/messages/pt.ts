@@ -32,6 +32,11 @@ const pt: Messages = {
     settings: 'Configurações',
   },
   clinic: {
+    exportCsv: 'Exportar CSV',
+    csv: {
+      name: 'Nome', email: 'E-mail', phone: 'Telefone', status: 'Status', dateOfBirth: 'Data de nascimento',
+      language: 'Idioma', lastVisit: 'Última visita', notes: 'Notas', createdAt: 'Cadastrado em',
+    },
     title: 'Clínica',
     subtitle: 'Seus pacientes e como estão as consultas deles',
     onboarding: {
@@ -113,6 +118,8 @@ const pt: Messages = {
     },
   },
   integrations: {
+    scope: 'Acesso',
+    scopes: { read: 'Somente leitura', write: 'Leitura e escrita' },
     title: 'API e webhooks',
     subtitle: 'Conecte o HealthAI às ferramentas que você já usa',
     baseUrl: 'URL base',

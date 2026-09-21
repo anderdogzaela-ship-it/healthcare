@@ -4,7 +4,6 @@ import { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { Heart, Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
-import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { requestPasswordReset, type AuthMessageKey } from '@/app/actions/auth';
 
 export default function ForgotPasswordPage() {
@@ -27,7 +26,6 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-slate-50 via-emerald-50/60 to-slate-50 relative overflow-hidden">
       <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-emerald-200/40 blur-3xl animate-blob" />
-      <LanguageSwitcher className="absolute top-4 right-4" />
 
       <div className="relative w-full max-w-md">
         <Link href="/" className="flex items-center justify-center gap-3 mb-8">

@@ -153,6 +153,7 @@ test.describe('API refuses unauthenticated calls', () => {
     ['/api/automation/reminders/due', 401],
     ['/api/cron/webhook-retries', 401],
     ['/api/account/export', 401],
+    ['/api/clinic/patients/export', 401],
   ];
 
   for (const [path, status] of cases) {

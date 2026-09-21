@@ -31,6 +31,11 @@ const en = {
     settings: 'Settings',
   },
   clinic: {
+    exportCsv: 'Export CSV',
+    csv: {
+      name: 'Name', email: 'Email', phone: 'Phone', status: 'Status', dateOfBirth: 'Date of birth',
+      language: 'Language', lastVisit: 'Last visit', notes: 'Notes', createdAt: 'Added on',
+    },
     title: 'Clinic',
     subtitle: 'Your patients and how their visits are going',
     onboarding: {
@@ -112,6 +117,8 @@ const en = {
     },
   },
   integrations: {
+    scope: 'Access',
+    scopes: { read: 'Read only', write: 'Read and write' },
     title: 'API and webhooks',
     subtitle: 'Connect HealthAI to the tools you already use',
     baseUrl: 'Base URL',

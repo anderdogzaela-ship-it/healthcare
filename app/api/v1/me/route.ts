@@ -22,7 +22,11 @@ export async function GET(request: Request) {
     data: {
       clinic,
       authenticated: true,
-      scopes: ['patients:read', 'patients:write', 'appointments:read', 'appointments:write'],
+      access: caller.scope,
+      scopes:
+        caller.scope === 'read'
+          ? ['patients:read', 'appointments:read']
+          : ['patients:read', 'patients:write', 'appointments:read', 'appointments:write'],
     },
   });
 }
