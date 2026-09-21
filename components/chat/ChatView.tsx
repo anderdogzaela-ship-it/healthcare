@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Heart, Send, Plus, Clock, User, AlertCircle, Sparkles } from 'lucide-react';
+import { Heart, Send, Plus, Clock, User, AlertCircle, Sparkles, Trash2 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
+import { deleteConversation } from '@/app/actions/chat';
 
 export interface ChatMessage {
   id: string;
@@ -70,7 +71,6 @@ export default function ChatView({
       }
 
       const newId = response.headers.get('X-Conversation-Id');
-      if (newId && newId !== conversationId) setConversationId(newId);
 
       const replyId = `reply-${Date.now()}`;
       setMessages((prev) => [...prev, { id: replyId, role: 'ai', content: '' }]);
@@ -92,7 +92,14 @@ export default function ChatView({
         setMessages((prev) => prev.map((msg) => (msg.id === replyId ? { ...msg, content: reply } : msg)));
       }
 
-      if (!reply) setErrorKey('error');
+      if (!reply) {
+        // The server discards a conversation that got no answer, so this one
+        // is not adopted: the next attempt starts cleanly.
+        setErrorKey('error');
+        setMessages((prev) => prev.filter((msg) => msg.id !== replyId));
+        return;
+      }
+      if (newId && newId !== conversationId) setConversationId(newId);
       // Refresh the conversation list in the sidebar.
       router.refresh();
     } catch {
@@ -106,6 +113,20 @@ export default function ChatView({
     setConversationId(null);
     setMessages([]);
     setErrorKey(null);
+  };
+
+  const removeConversation = async (id: string) => {
+    if (!window.confirm(m.chat.deleteConfirm)) return;
+    const result = await deleteConversation(id);
+    if (result.status !== 'ok') {
+      setErrorKey('error');
+      return;
+    }
+    if (id === conversationId) {
+      startNewConversation();
+      router.push('/chat');
+    }
+    router.refresh();
   };
 
   return (
@@ -140,21 +161,33 @@ export default function ChatView({
           {conversations.map((conversation) => {
             const active = conversation.id === conversationId;
             return (
-              <button
+              <div
                 key={conversation.id}
-                onClick={() => router.push(`/chat?c=${conversation.id}`)}
-                className={`w-full text-left p-3 rounded-xl transition-colors ${active ? 'bg-emerald-50 border border-emerald-100' : 'hover:bg-gray-50'}`}
+                className={`group relative rounded-xl transition-colors ${active ? 'bg-emerald-50 border border-emerald-100' : 'hover:bg-gray-50'}`}
               >
-                <p className={`text-sm truncate ${active ? 'font-semibold text-emerald-700' : 'font-medium text-gray-700'}`}>
-                  {conversation.title || m.chat.currentSession}
-                </p>
-                <div className="flex items-center gap-1 mt-1">
-                  <Clock className="w-3 h-3 text-gray-400" />
-                  <p className="text-xs text-gray-400">
-                    {formatDate(new Date(conversation.updatedAt), { day: 'numeric', month: 'short' })}
+                <button
+                  onClick={() => router.push(`/chat?c=${conversation.id}`)}
+                  className="w-full text-left p-3 pr-10"
+                >
+                  <p className={`text-sm truncate ${active ? 'font-semibold text-emerald-700' : 'font-medium text-gray-700'}`}>
+                    {conversation.title || m.chat.currentSession}
                   </p>
-                </div>
-              </button>
+                  <div className="flex items-center gap-1 mt-1">
+                    <Clock className="w-3 h-3 text-gray-400" />
+                    <p className="text-xs text-gray-400">
+                      {formatDate(new Date(conversation.updatedAt), { day: 'numeric', month: 'short' })}
+                    </p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => void removeConversation(conversation.id)}
+                  aria-label={m.chat.deleteConversation}
+                  title={m.chat.deleteConversation}
+                  className="absolute top-3 right-2 p-1.5 rounded-lg text-gray-300 opacity-0 group-hover:opacity-100 focus:opacity-100 hover:text-red-500 hover:bg-red-50 transition-all"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             );
           })}
         </div>

@@ -9,6 +9,7 @@ import { useI18n } from '@/lib/i18n/I18nProvider';
 import { locales, localeNames, type Locale } from '@/lib/i18n/config';
 import { updateSettings } from '@/app/actions/settings';
 import { deleteAccount } from '@/app/actions/account';
+import SampleDataCard from '@/components/settings/SampleDataCard';
 
 function Toggle({ on, onChange, label }: { on: boolean; onChange: () => void; label: string }) {
   return (
@@ -347,6 +348,8 @@ export default function SettingsForm({ initial }: { initial: SettingsFormData })
             <p className="text-xs text-purple-700 leading-relaxed">{m.settings.privacyNote}</p>
           </div>
         </div>
+
+        <SampleDataCard />
 
         {/* Your data */}
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">

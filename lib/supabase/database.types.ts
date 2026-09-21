@@ -353,6 +353,7 @@ export interface Database {
           locale?: AppLocale;
           status?: PatientStatus;
           notes?: string | null;
+          last_visit_at?: string | null;
         };
         Update: {
           full_name?: string;

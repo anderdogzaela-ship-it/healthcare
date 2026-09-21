@@ -170,6 +170,13 @@ supabase/migrations/    SQL schema
   [automations/api/](automations/api/)
 - Data export and account deletion, as the LGPD and GDPR require
 - Full interface in English, Spanish and Portuguese
+- **Sample data for demos**: Settings → *Sample data* fills the account with
+  30 days of fictitious vitals, sleep and activity, plus sample patients,
+  notes and appointments in the active clinic. Days the user logged are never
+  overwritten, and *Remove sample data* deletes only what it added (vitals
+  marked `sample-…`, patients on `@sample.example.com`). No reminders are
+  queued for sample appointments, and the phone numbers are in the
+  +1 202 555 01xx range reserved for fiction.
 
 ## The AI assistant
 
