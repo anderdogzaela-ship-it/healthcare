@@ -436,6 +436,7 @@ const es: Messages = {
     thinking: 'Leyendo tus datos...',
     error: 'Algo salió mal. Inténtalo de nuevo.',
     rateLimited: 'Llegaste al límite de mensajes por hora. Inténtalo más tarde.',
+    notConfigured: 'El asistente todavía no está configurado en este despliegue.',
   },
   settings: {
     title: 'Configuración',

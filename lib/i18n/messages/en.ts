@@ -434,6 +434,7 @@ const en = {
     thinking: 'Reading your data...',
     error: 'Something went wrong. Please try again.',
     rateLimited: 'You have reached the hourly message limit. Please try again later.',
+    notConfigured: 'The assistant is not configured on this deployment yet.',
   },
   settings: {
     title: 'Settings',

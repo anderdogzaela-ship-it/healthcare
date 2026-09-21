@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { createClient, requireUser } from '@/lib/supabase/server';
 import { getClinicContext } from '@/lib/data/clinic';
 import { canAddPatient } from '@/lib/billing/limits';
+import { logDbError } from '@/lib/supabase/log';
 
 export type ClinicResult =
   | { status: 'ok'; id?: string }
@@ -50,13 +51,12 @@ export async function createClinic(formData: FormData): Promise<ClinicResult> {
     .select('id')
     .single();
 
+  logDbError('clinic.insert', error);
   if (error || !clinic) return { status: 'error', reason: 'failed' };
 
-  const { error: memberError } = await supabase
-    .from('clinic_members')
-    .insert({ clinic_id: clinic.id, user_id: user.id, role: 'owner' });
-
-  if (memberError) return { status: 'error', reason: 'failed' };
+  // The owner membership is created by the on_clinic_created trigger: doing it
+  // here would need to read the clinic back, which the select policy refuses
+  // until the membership exists.
 
   revalidatePath('/clinic');
   return { status: 'ok', id: clinic.id };
@@ -95,6 +95,7 @@ export async function createPatient(formData: FormData): Promise<ClinicResult> {
     .select('id')
     .single();
 
+  logDbError('clinic.patients.insert', error);
   if (error || !data) return { status: 'error', reason: 'failed' };
 
   revalidatePath('/clinic');

@@ -436,6 +436,7 @@ const pt: Messages = {
     thinking: 'Lendo seus dados...',
     error: 'Algo deu errado. Tente novamente.',
     rateLimited: 'Você atingiu o limite de mensagens por hora. Tente mais tarde.',
+    notConfigured: 'O assistente ainda não está configurado neste ambiente.',
   },
   settings: {
     title: 'Configurações',
