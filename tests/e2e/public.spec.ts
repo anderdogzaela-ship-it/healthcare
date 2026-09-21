@@ -128,7 +128,7 @@ test.describe('languages', () => {
 });
 
 test.describe('authentication gates', () => {
-  const protectedRoutes = ['/dashboard', '/health', '/appointments', '/clinic', '/chat', '/activity', '/settings'];
+  const protectedRoutes = ['/dashboard', '/health', '/appointments', '/clinic', '/chat', '/activity', '/settings', '/report'];
 
   for (const route of protectedRoutes) {
     test(`${route} redirects a signed-out visitor to login`, async ({ page }) => {
@@ -188,6 +188,7 @@ test.describe('API refuses unauthenticated calls', () => {
     ['/api/v1/patients', 401],
     ['/api/automation/reminders/due', 401],
     ['/api/cron/webhook-retries', 401],
+    ['/api/cron/weekly-report', 401],
     ['/api/account/export', 401],
     ['/api/clinic/patients/export', 401],
   ];

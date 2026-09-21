@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Heart, MessageCircle, Moon, TrendingUp, TrendingDown, ChevronRight,
-  Bell, Zap, Footprints, Sparkles
+  Bell, Zap, Footprints, Sparkles, ClipboardList
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import type { DashboardData } from '@/lib/data/health';
@@ -219,6 +219,20 @@ export default function DashboardView({ data, firstName }: { data: DashboardData
                 <p className="text-xs text-amber-100">{m.dashboard.askAssistant.description}</p>
               </div>
               <ChevronRight className="w-4 h-4 ml-auto" />
+            </Link>
+
+            <Link
+              href="/report"
+              className="w-full bg-white text-gray-800 rounded-2xl p-4 flex items-center gap-3 border border-gray-100 hover:border-emerald-200 transition-all shadow-sm hover:shadow-md transform hover:scale-[1.02]"
+            >
+              <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center">
+                <ClipboardList className="w-5 h-5 text-indigo-500" />
+              </div>
+              <div className="text-left">
+                <p className="font-bold text-sm" style={{ fontFamily: 'Nunito, sans-serif' }}>{m.report.title}</p>
+                <p className="text-xs text-gray-500">{m.report.dashboardLink}</p>
+              </div>
+              <ChevronRight className="w-4 h-4 ml-auto text-gray-400" />
             </Link>
           </div>
         </div>

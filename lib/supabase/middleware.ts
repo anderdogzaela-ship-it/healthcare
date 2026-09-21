@@ -4,7 +4,7 @@ import { supabaseAnonKey, supabaseUrl } from './env';
 
 /** Routes that require a signed-in user. */
 const PROTECTED = [
-  '/dashboard', '/health', '/appointments', '/clinic', '/chat', '/activity', '/settings', '/reset-password',
+  '/dashboard', '/health', '/appointments', '/clinic', '/chat', '/activity', '/settings', '/report', '/reset-password',
 ];
 /** Auth pages a signed-in user has no reason to see. */
 const AUTH_PAGES = ['/login', '/signup'];

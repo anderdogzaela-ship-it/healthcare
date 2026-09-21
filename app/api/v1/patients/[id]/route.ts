@@ -94,13 +94,17 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
   const admin = createAdminClient();
 
   if (hard) {
-    const { error } = await admin
+    const { data, error } = await admin
       .from('patients')
       .delete()
       .eq('id', params.id)
-      .eq('clinic_id', caller.clinicId);
+      .eq('clinic_id', caller.clinicId)
+      .select('id')
+      .maybeSingle();
 
     if (error) return apiError(500, 'delete_failed');
+    // Same answer as every other route for an id this clinic does not have.
+    if (!data) return apiError(404, 'not_found');
     return new Response(null, { status: 204 });
   }
 
