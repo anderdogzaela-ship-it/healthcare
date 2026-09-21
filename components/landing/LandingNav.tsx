@@ -11,6 +11,7 @@ const sections = [
   { key: 'how', href: '#how' },
   { key: 'pricing', href: '#pricing' },
   { key: 'faq', href: '#faq' },
+  { key: 'caseStudy', href: '/case-study' },
 ] as const;
 
 export default function LandingNav() {
@@ -83,7 +84,7 @@ export default function LandingNav() {
       {/* Mobile menu */}
       <div
         className={`lg:hidden overflow-hidden bg-white/95 backdrop-blur-xl border-t border-gray-100 transition-all duration-300 ${
-          menuOpen ? 'max-h-[26rem] opacity-100' : 'max-h-0 opacity-0'
+          menuOpen ? 'max-h-[30rem] opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
         <div className="px-4 py-4 space-y-1">

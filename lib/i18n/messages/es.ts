@@ -429,6 +429,8 @@ const es: Messages = {
     },
   },
   chat: {
+    showConversations: 'Ver conversaciones',
+    closeConversations: 'Cerrar conversaciones',
     deleteConversation: 'Eliminar conversación',
     deleteConfirm: '¿Eliminar esta conversación? No se puede deshacer.',
     conversations: 'Conversaciones',
@@ -531,6 +533,7 @@ const es: Messages = {
   },
   landing: {
     nav: {
+      caseStudy: 'Caso de estudio',
       features: 'Funciones',
       how: 'Cómo funciona',
       pricing: 'Precios',
@@ -735,6 +738,99 @@ const es: Messages = {
       rights: '© {year} HealthAI. Demostración de portafolio.',
       demoNote: 'Proyecto de demostración: todos los datos, nombres y testimonios son ficticios.',
     },
+  },
+  caseStudy: {
+    metaTitle: 'Caso de estudio — SaaS de salud HealthAI',
+    metaDescription: 'Cómo se construyó un SaaS de salud multilingüe con asistente de IA, recordatorios por WhatsApp, CRM, API pública y automatizaciones con n8n.',
+    back: 'Volver al sitio',
+    liveDemo: 'Abrir la demo en vivo',
+    eyebrow: 'Caso de estudio',
+    title: 'Un SaaS de salud con IA, WhatsApp y automatización, construido de punta a punta',
+    summary: 'HealthAI es una plataforma funcional para clínicas y sus pacientes: seguimiento de salud, un asistente de IA que lee los datos del propio paciente, recordatorios de citas por WhatsApp, un CRM de pacientes, una API pública y flujos de n8n listos para usar. Funciona en inglés, español y portugués.',
+    stats: {
+      languages: 'idiomas, intercambiables en cualquier momento',
+      areas: 'áreas de servicio en un solo producto',
+      providers: 'proveedores de IA compatibles',
+      rls: 'de las tablas protegidas con seguridad a nivel de fila',
+    },
+    challenge: {
+      title: 'El desafío',
+      body: 'Las clínicas pequeñas pierden citas por inasistencias, responden las mismas preguntas por WhatsApp todo el día y tienen la información de los pacientes dispersa en hojas de cálculo. Las herramientas genéricas resuelven una parte cada una y no se comunican entre sí.',
+    },
+    solution: {
+      title: 'La solución',
+      body: 'Una plataforma multiempresa donde la clínica gestiona pacientes y citas, los recordatorios salen por WhatsApp automáticamente, los pacientes siguen su salud y consultan a un asistente de IA, y todo se conecta con otros sistemas mediante API, webhooks y n8n.',
+    },
+    builtTitle: 'Qué se construyó',
+    builtSubtitle: 'Cada área es código funcionando en la demo en vivo, no una maqueta.',
+    areas: {
+      ai: {
+        title: 'Agente de IA (LLM)',
+        body: 'Un asistente con respuestas en tiempo real que usa herramientas de solo lectura para consultar los signos vitales, el sueño y la actividad del propio paciente antes de responder. Las emergencias se detectan antes de llamar a cualquier modelo. Funciona con Claude o Gemini, según la configuración.',
+      },
+      whatsapp: {
+        title: 'Chatbot de WhatsApp',
+        body: 'Recordatorios 24 horas y 2 horas antes de cada cita. El paciente responde para confirmar, cancelar o pedir un cambio, y la cita se actualiza sola.',
+      },
+      automation: {
+        title: 'Automatización con n8n',
+        body: 'Flujos de n8n versionados para recordatorios y respuestas, una tarea programada para reintentar webhooks y endpoints protegidos pensados para programadores de tareas.',
+      },
+      zapier: {
+        title: 'Zapier y Make',
+        body: 'Webhooks firmados en cada evento importante y una API REST, para que la clínica conecte sus propias herramientas sin programar.',
+      },
+      crm: {
+        title: 'CRM de pacientes',
+        body: 'Un embudo de prospecto a paciente activo, notas, citas e historial de visitas, por clínica y con roles para el equipo.',
+      },
+      api: {
+        title: 'Integración por API',
+        body: 'Una API REST pública documentada (OpenAPI) con claves por clínica guardadas como hash, límite de solicitudes y webhooks firmados con HMAC y reintentos automáticos.',
+      },
+      saas: {
+        title: 'SaaS / B2B',
+        body: 'Varias clínicas por cuenta, invitaciones al equipo, roles de propietario, profesional y recepción, planes de suscripción con Stripe y límites de usuarios que se aplican de verdad.',
+      },
+    },
+    architectureTitle: 'Arquitectura',
+    architectureSubtitle: 'Una sola aplicación Next.js en Vercel, con la base de datos haciendo el trabajo de seguridad.',
+    architecture: {
+      users: 'Pacientes y equipo de la clínica',
+      usersDetail: 'Navegador y celular, en 3 idiomas',
+      app: 'Next.js en Vercel',
+      appDetail: 'Páginas, acciones de servidor, rutas de API',
+      db: 'Supabase',
+      dbDetail: 'Postgres, autenticación, seguridad a nivel de fila',
+      ai: 'Proveedor de IA',
+      aiDetail: 'Claude o Gemini, con uso de herramientas',
+      billing: 'Stripe',
+      billingDetail: 'Planes, pago, webhooks',
+      automation: 'n8n → WhatsApp',
+      automationDetail: 'Recordatorios y respuestas',
+      external: 'Sistemas externos',
+      externalDetail: 'API REST, webhooks, Zapier, Make',
+    },
+    securityTitle: 'Seguridad y privacidad',
+    security: {
+      rls: 'Todas las tablas usan seguridad a nivel de fila: cada clínica y cada usuario solo pueden leer sus propios registros.',
+      keys: 'Las claves de API se guardan solo como hash; los webhooks se firman con HMAC para que el receptor pueda verificarlos.',
+      secrets: 'Las claves de IA, de pagos y de la base de datos viven solo en el servidor y nunca llegan al navegador.',
+      lgpd: 'Consentimiento al registrarse, exportación de datos y eliminación de la cuenta, según la LGPD y el RGPD.',
+      safety: 'El asistente nunca diagnostica ni orienta sobre medicamentos, y los síntomas urgentes reciben directamente una indicación de emergencia.',
+    },
+    stackTitle: 'Tecnología',
+    processTitle: 'Cómo se entregó el trabajo',
+    process: {
+      steps: 'Pasos pequeños y revisados, cada uno con un commit claro.',
+      tests: 'Pruebas automatizadas en el navegador para las páginas públicas, los idiomas y las reglas de acceso.',
+      docs: 'Guía de instalación, referencia de la API (OpenAPI) y notas de integración en el repositorio.',
+      deploy: 'Despliegue continuo en Vercel desde la rama principal.',
+    },
+    ctaTitle: '¿Necesitas algo similar para tu negocio?',
+    ctaBody: 'Automatizaciones, bots de WhatsApp, asistentes de IA, integraciones por API o un SaaS completo: envíame un mensaje en Workana con lo que necesitas.',
+    ctaDemo: 'Probar la demo en vivo',
+    note: 'Proyecto de portafolio. Todos los nombres y datos de la demo son ficticios.',
   },
 };
 

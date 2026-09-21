@@ -427,6 +427,8 @@ const en = {
     },
   },
   chat: {
+    showConversations: 'Show conversations',
+    closeConversations: 'Close conversations',
     deleteConversation: 'Delete conversation',
     deleteConfirm: 'Delete this conversation? This cannot be undone.',
     conversations: 'Conversations',
@@ -520,6 +522,7 @@ const en = {
   },
   landing: {
     nav: {
+      caseStudy: 'Case study',
       features: 'Features',
       how: 'How it works',
       pricing: 'Pricing',
@@ -724,6 +727,99 @@ const en = {
       rights: '© {year} HealthAI. Portfolio demo.',
       demoNote: 'Demo project: all data, names and testimonials are fictitious.',
     },
+  },
+  caseStudy: {
+    metaTitle: 'Case study — HealthAI healthcare SaaS',
+    metaDescription: 'How a multilingual healthcare SaaS with an AI assistant, WhatsApp reminders, CRM, public API and n8n automations was built.',
+    back: 'Back to the site',
+    liveDemo: 'Open the live demo',
+    eyebrow: 'Case study',
+    title: 'A healthcare SaaS with AI, WhatsApp and automation, built end to end',
+    summary: 'HealthAI is a working platform for clinics and their patients: health tracking, an AI assistant that reads the patient’s own data, WhatsApp appointment reminders, a patient CRM, a public API and ready-made n8n workflows. It runs in English, Spanish and Portuguese.',
+    stats: {
+      languages: 'languages, switchable at any time',
+      areas: 'service areas in one product',
+      providers: 'AI providers supported',
+      rls: 'of tables protected by row-level security',
+    },
+    challenge: {
+      title: 'The challenge',
+      body: 'Small clinics lose appointments to no-shows, answer the same WhatsApp questions all day and keep patient information scattered across spreadsheets. Off-the-shelf tools solve one piece each and do not talk to each other.',
+    },
+    solution: {
+      title: 'The solution',
+      body: 'One multi-tenant platform where the clinic manages patients and bookings, reminders go out on WhatsApp automatically, patients track their health and ask an AI assistant about it, and everything is open to other systems through an API, webhooks and n8n.',
+    },
+    builtTitle: 'What was built',
+    builtSubtitle: 'Each area is working code in the live demo, not a mock-up.',
+    areas: {
+      ai: {
+        title: 'AI agent (LLM)',
+        body: 'A streaming assistant that calls read-only tools to fetch the patient’s own vitals, sleep and activity before answering. Emergencies are detected before any model is called. Runs on Claude or Gemini, switchable by configuration.',
+      },
+      whatsapp: {
+        title: 'WhatsApp chatbot',
+        body: 'Reminders 24 hours and 2 hours before each appointment. Patients reply to confirm or cancel, or ask to reschedule, and the booking updates itself.',
+      },
+      automation: {
+        title: 'Automation with n8n',
+        body: 'Versioned n8n workflows for reminders and replies, a scheduled job for webhook retries, and secured endpoints built for schedulers.',
+      },
+      zapier: {
+        title: 'Zapier and Make',
+        body: 'Signed webhooks on every important event and a REST API, so a clinic can connect its own tools without writing code.',
+      },
+      crm: {
+        title: 'Patient CRM',
+        body: 'A pipeline from lead to active patient, notes, bookings and visit history, per clinic, with staff roles.',
+      },
+      api: {
+        title: 'API integration',
+        body: 'A documented public REST API (OpenAPI) with per-clinic keys stored as hashes, rate limiting, and HMAC-signed webhooks with automatic retries.',
+      },
+      saas: {
+        title: 'SaaS / B2B',
+        body: 'Several clinics per account, team invitations, owner, professional and receptionist roles, subscription plans with Stripe, and seat limits that are really enforced.',
+      },
+    },
+    architectureTitle: 'Architecture',
+    architectureSubtitle: 'A single Next.js application on Vercel, with the database doing the security work.',
+    architecture: {
+      users: 'Patients and clinic staff',
+      usersDetail: 'Browser and phone, in 3 languages',
+      app: 'Next.js on Vercel',
+      appDetail: 'Pages, server actions, API routes',
+      db: 'Supabase',
+      dbDetail: 'Postgres, authentication, row-level security',
+      ai: 'AI provider',
+      aiDetail: 'Claude or Gemini, with tool calling',
+      billing: 'Stripe',
+      billingDetail: 'Plans, checkout, webhooks',
+      automation: 'n8n → WhatsApp',
+      automationDetail: 'Reminders and replies',
+      external: 'External systems',
+      externalDetail: 'REST API, webhooks, Zapier, Make',
+    },
+    securityTitle: 'Security and privacy',
+    security: {
+      rls: 'Every table is protected by row-level security: each clinic and each user can only ever read their own rows.',
+      keys: 'API keys are stored only as hashes; webhooks are signed with HMAC so receivers can verify them.',
+      secrets: 'AI, payment and database keys live only on the server and never reach the browser.',
+      lgpd: 'Consent at sign-up, data export and account deletion, following the LGPD and the GDPR.',
+      safety: 'The assistant never diagnoses or advises on medication, and urgent symptoms are sent straight to emergency guidance.',
+    },
+    stackTitle: 'Technology',
+    processTitle: 'How the work was delivered',
+    process: {
+      steps: 'Small, reviewed steps, each with a clear commit message.',
+      tests: 'Automated browser tests for the public pages, languages and access rules.',
+      docs: 'Setup guide, API reference (OpenAPI) and integration notes in the repository.',
+      deploy: 'Continuous deployment on Vercel from the main branch.',
+    },
+    ctaTitle: 'Need something similar for your business?',
+    ctaBody: 'Automations, WhatsApp bots, AI assistants, API integrations or a complete SaaS: send me a message on Workana with what you need.',
+    ctaDemo: 'Try the live demo',
+    note: 'Portfolio project. All names and data in the demo are fictitious.',
   },
 };
 

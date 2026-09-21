@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Heart, Send, Plus, Clock, User, AlertCircle, Sparkles, Trash2 } from 'lucide-react';
+import { Heart, Send, Plus, Clock, User, AlertCircle, Sparkles, Trash2, MessagesSquare, X } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { deleteConversation } from '@/app/actions/chat';
 
@@ -34,6 +34,8 @@ export default function ChatView({
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [errorKey, setErrorKey] = useState<'error' | 'rateLimited' | 'notConfigured' | null>(null);
+  // Below the lg breakpoint the conversation list is a drawer instead of a column.
+  const [listOpen, setListOpen] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -113,7 +115,23 @@ export default function ChatView({
     setConversationId(null);
     setMessages([]);
     setErrorKey(null);
+    setListOpen(false);
   };
+
+  const openConversation = (id: string) => {
+    setListOpen(false);
+    router.push(`/chat?c=${id}`);
+  };
+
+  // Escape closes the drawer, as it would any dialog.
+  useEffect(() => {
+    if (!listOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setListOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [listOpen]);
 
   const removeConversation = async (id: string) => {
     if (!window.confirm(m.chat.deleteConfirm)) return;
@@ -129,6 +147,57 @@ export default function ChatView({
     router.refresh();
   };
 
+  const conversationList = (
+    <div className="flex-1 overflow-y-auto p-3 space-y-1">
+      {conversationId === null && (
+        <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100">
+          <p className="text-sm font-semibold text-emerald-700 truncate">{m.chat.currentSession}</p>
+          <div className="flex items-center gap-1 mt-1">
+            <Clock className="w-3 h-3 text-gray-400" />
+            <p className="text-xs text-gray-400">{m.chat.justNow}</p>
+          </div>
+        </div>
+      )}
+
+      {conversations.length === 0 && conversationId !== null && (
+        <p className="p-3 text-sm text-gray-400">{m.chat.noConversations}</p>
+      )}
+
+      {conversations.map((conversation) => {
+        const active = conversation.id === conversationId;
+        return (
+          <div
+            key={conversation.id}
+            className={`group relative rounded-xl transition-colors ${active ? 'bg-emerald-50 border border-emerald-100' : 'hover:bg-gray-50'}`}
+          >
+            <button
+              onClick={() => openConversation(conversation.id)}
+              className="w-full text-left p-3 pr-10"
+            >
+              <p className={`text-sm truncate ${active ? 'font-semibold text-emerald-700' : 'font-medium text-gray-700'}`}>
+                {conversation.title || m.chat.currentSession}
+              </p>
+              <div className="flex items-center gap-1 mt-1">
+                <Clock className="w-3 h-3 text-gray-400" />
+                <p className="text-xs text-gray-400">
+                  {formatDate(new Date(conversation.updatedAt), { day: 'numeric', month: 'short' })}
+                </p>
+              </div>
+            </button>
+            <button
+              onClick={() => void removeConversation(conversation.id)}
+              aria-label={m.chat.deleteConversation}
+              title={m.chat.deleteConversation}
+              className="absolute top-3 right-2 p-1.5 rounded-lg text-gray-300 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 hover:text-red-500 hover:bg-red-50 transition-all"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div className="flex-1 flex overflow-hidden">
       {/* Conversations panel */}
@@ -143,59 +212,54 @@ export default function ChatView({
             <Plus className="w-4 h-4 text-white" />
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto p-3 space-y-1">
-          {conversationId === null && (
-            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100">
-              <p className="text-sm font-semibold text-emerald-700 truncate">{m.chat.currentSession}</p>
-              <div className="flex items-center gap-1 mt-1">
-                <Clock className="w-3 h-3 text-gray-400" />
-                <p className="text-xs text-gray-400">{m.chat.justNow}</p>
+        {conversationList}
+      </div>
+
+      {/* Conversation drawer on small screens */}
+      {listOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex" role="dialog" aria-modal="true" aria-label={m.chat.conversations}>
+          <button
+            type="button"
+            aria-label={m.chat.closeConversations}
+            onClick={() => setListOpen(false)}
+            className="absolute inset-0 bg-gray-900/40"
+          />
+          <div className="relative w-80 max-w-[85%] h-full bg-white shadow-xl flex flex-col animate-slide-up">
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h2 className="font-bold text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>{m.chat.conversations}</h2>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={startNewConversation}
+                  aria-label={m.chat.newConversation}
+                  className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center hover:bg-emerald-600 transition-colors"
+                >
+                  <Plus className="w-4 h-4 text-white" />
+                </button>
+                <button
+                  onClick={() => setListOpen(false)}
+                  aria-label={m.chat.closeConversations}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
             </div>
-          )}
-
-          {conversations.length === 0 && conversationId !== null && (
-            <p className="p-3 text-sm text-gray-400">{m.chat.noConversations}</p>
-          )}
-
-          {conversations.map((conversation) => {
-            const active = conversation.id === conversationId;
-            return (
-              <div
-                key={conversation.id}
-                className={`group relative rounded-xl transition-colors ${active ? 'bg-emerald-50 border border-emerald-100' : 'hover:bg-gray-50'}`}
-              >
-                <button
-                  onClick={() => router.push(`/chat?c=${conversation.id}`)}
-                  className="w-full text-left p-3 pr-10"
-                >
-                  <p className={`text-sm truncate ${active ? 'font-semibold text-emerald-700' : 'font-medium text-gray-700'}`}>
-                    {conversation.title || m.chat.currentSession}
-                  </p>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Clock className="w-3 h-3 text-gray-400" />
-                    <p className="text-xs text-gray-400">
-                      {formatDate(new Date(conversation.updatedAt), { day: 'numeric', month: 'short' })}
-                    </p>
-                  </div>
-                </button>
-                <button
-                  onClick={() => void removeConversation(conversation.id)}
-                  aria-label={m.chat.deleteConversation}
-                  title={m.chat.deleteConversation}
-                  className="absolute top-3 right-2 p-1.5 rounded-lg text-gray-300 opacity-0 group-hover:opacity-100 focus:opacity-100 hover:text-red-500 hover:bg-red-50 transition-all"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            );
-          })}
+            {conversationList}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Chat area */}
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="px-6 py-4 bg-white border-b border-gray-100 flex items-center gap-3 shadow-sm">
+        <div className="px-4 lg:px-6 py-4 bg-white border-b border-gray-100 flex items-center gap-3 shadow-sm">
+          <button
+            type="button"
+            onClick={() => setListOpen(true)}
+            aria-label={m.chat.showConversations}
+            className="lg:hidden w-10 h-10 -ml-1 rounded-xl flex items-center justify-center text-gray-600 hover:bg-gray-100 transition-colors flex-shrink-0"
+          >
+            <MessagesSquare className="w-5 h-5" />
+          </button>
           <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-md">
             <Heart className="w-5 h-5 text-white fill-white" />
           </div>

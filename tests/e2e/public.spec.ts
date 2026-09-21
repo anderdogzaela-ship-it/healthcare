@@ -36,6 +36,28 @@ test.describe('landing page', () => {
   });
 });
 
+test.describe('case study', () => {
+  test('is linked from the landing page and renders every section', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('link', { name: 'Case study' }).first().click();
+    await expect(page).toHaveURL(/\/case-study$/);
+
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('A healthcare SaaS with AI');
+    for (const title of ['What was built', 'Architecture', 'Security and privacy', 'Technology']) {
+      await expect(page.getByRole('heading', { name: title })).toBeVisible();
+    }
+    await expect(page.getByRole('heading', { name: 'WhatsApp chatbot' })).toBeVisible();
+    await expect(page).toHaveTitle(/Case study/);
+  });
+
+  test('is translated into Portuguese', async ({ page, context }) => {
+    await context.addCookies([{ name: 'locale', value: 'pt', url: 'http://localhost' }]);
+    await page.goto('/case-study');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Um SaaS de saúde');
+    await expect(page).toHaveTitle(/Estudo de caso/);
+  });
+});
+
 test.describe('languages', () => {
   test('cookie selects Portuguese', async ({ page, context }) => {
     await context.addCookies([
