@@ -12,32 +12,100 @@
       "name": "WhatsApp webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [-420, 0],
+      "position": [-640, 0],
       "webhookId": "healthai-whatsapp"
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "={{ $env.HEALTHAI_BASE_URL }}/api/automation/whatsapp/inbound",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
+        "assignments": {
+          "assignments": [
             {
-              "name": "x-api-key",
-              "value": "={{ $env.HEALTHAI_AUTOMATION_KEY }}"
+              "id": "2b000000-0000-4000-8000-0000000000a1",
+              "name": "baseUrl",
+              "value": "https://healthcare-beta-lemon.vercel.app",
+              "type": "string"
+            },
+            {
+              "id": "2b000000-0000-4000-8000-0000000000a2",
+              "name": "twilioAccountSid",
+              "value": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+              "type": "string"
+            },
+            {
+              "id": "2b000000-0000-4000-8000-0000000000a3",
+              "name": "whatsappFrom",
+              "value": "whatsapp:+14155238886",
+              "type": "string"
+            },
+            {
+              "id": "2b000000-0000-4000-8000-0000000000a4",
+              "name": "webhookToken",
+              "value": "REPLACE-WITH-A-LONG-RANDOM-VALUE",
+              "type": "string"
             }
           ]
         },
+        "options": {}
+      },
+      "id": "2b000000-0000-4000-8000-000000000006",
+      "name": "Settings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-420, 0],
+      "notes": "Edit these values. webhookToken must also be appended to the webhook URL given to Twilio: ...?token=<the same value>"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $('WhatsApp webhook').item.json.query.token }}",
+              "rightValue": "={{ $json.webhookToken }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "leftValue": "={{ $json.webhookToken }}",
+              "rightValue": "REPLACE-WITH-A-LONG-RANDOM-VALUE",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2b000000-0000-4000-8000-000000000007",
+      "name": "From Twilio?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-200, 0],
+      "notes": "Without the secret token anyone who found this URL could confirm or cancel a patient's appointment by pretending to be their number."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Settings').first().json.baseUrl }}/api/automation/whatsapp/inbound",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ from: ($json.body?.From || '').replace('whatsapp:', ''), text: $json.body?.Body || '', providerMessageId: $json.body?.MessageSid }) }}",
+        "jsonBody": "={{ JSON.stringify({ from: ($('WhatsApp webhook').item.json.body?.From || '').replace('whatsapp:', ''), text: $('WhatsApp webhook').item.json.body?.Body || '', providerMessageId: $('WhatsApp webhook').item.json.body?.MessageSid }) }}",
         "options": {}
       },
       "id": "2b000000-0000-4000-8000-000000000002",
       "name": "Ask HealthAI what it means",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [-180, 0]
+      "position": [40, -100]
     },
     {
       "parameters": {
@@ -65,12 +133,12 @@
       "name": "Has a reply?",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
-      "position": [60, 0]
+      "position": [280, -100]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://api.twilio.com/2010-04-01/Accounts/{{ $env.TWILIO_ACCOUNT_SID }}/Messages.json",
+        "url": "=https://api.twilio.com/2010-04-01/Accounts/{{ $('Settings').first().json.twilioAccountSid }}/Messages.json",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpBasicAuth",
         "sendBody": true,
@@ -79,7 +147,7 @@
           "parameters": [
             {
               "name": "From",
-              "value": "={{ $env.TWILIO_WHATSAPP_FROM }}"
+              "value": "={{ $('Settings').first().json.whatsappFrom }}"
             },
             {
               "name": "To",
@@ -97,7 +165,7 @@
       "name": "Reply on WhatsApp",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [300, -100]
+      "position": [520, -200]
     },
     {
       "parameters": {
@@ -109,12 +177,35 @@
       "name": "Acknowledge",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [540, 0]
+      "position": [760, -100]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "forbidden",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "id": "2b000000-0000-4000-8000-000000000008",
+      "name": "Reject",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [40, 140]
     }
   ],
   "connections": {
     "WhatsApp webhook": {
-      "main": [[{ "node": "Ask HealthAI what it means", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Settings", "type": "main", "index": 0 }]]
+    },
+    "Settings": {
+      "main": [[{ "node": "From Twilio?", "type": "main", "index": 0 }]]
+    },
+    "From Twilio?": {
+      "main": [
+        [{ "node": "Ask HealthAI what it means", "type": "main", "index": 0 }],
+        [{ "node": "Reject", "type": "main", "index": 0 }]
+      ]
     },
     "Ask HealthAI what it means": {
       "main": [[{ "node": "Has a reply?", "type": "main", "index": 0 }]]

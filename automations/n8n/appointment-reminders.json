@@ -16,20 +16,46 @@
       "name": "Every 5 minutes",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [-420, 0]
+      "position": [-640, 0]
     },
     {
       "parameters": {
-        "url": "={{ $env.HEALTHAI_BASE_URL }}/api/automation/reminders/due?limit=20",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
+        "assignments": {
+          "assignments": [
             {
-              "name": "x-api-key",
-              "value": "={{ $env.HEALTHAI_AUTOMATION_KEY }}"
+              "id": "1a000000-0000-4000-8000-0000000000a1",
+              "name": "baseUrl",
+              "value": "https://healthcare-beta-lemon.vercel.app",
+              "type": "string"
+            },
+            {
+              "id": "1a000000-0000-4000-8000-0000000000a2",
+              "name": "twilioAccountSid",
+              "value": "ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+              "type": "string"
+            },
+            {
+              "id": "1a000000-0000-4000-8000-0000000000a3",
+              "name": "whatsappFrom",
+              "value": "whatsapp:+14155238886",
+              "type": "string"
             }
           ]
         },
+        "options": {}
+      },
+      "id": "1a000000-0000-4000-8000-000000000007",
+      "name": "Settings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-420, 0],
+      "notes": "Edit these three values. Keys do not go here: they live in the two credentials."
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Settings').first().json.baseUrl }}/api/automation/reminders/due?limit=20",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
         "options": {}
       },
       "id": "1a000000-0000-4000-8000-000000000002",
@@ -52,7 +78,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://api.twilio.com/2010-04-01/Accounts/{{ $env.TWILIO_ACCOUNT_SID }}/Messages.json",
+        "url": "=https://api.twilio.com/2010-04-01/Accounts/{{ $('Settings').first().json.twilioAccountSid }}/Messages.json",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpBasicAuth",
         "sendBody": true,
@@ -61,7 +87,7 @@
           "parameters": [
             {
               "name": "From",
-              "value": "={{ $env.TWILIO_WHATSAPP_FROM }}"
+              "value": "={{ $('Settings').first().json.whatsappFrom }}"
             },
             {
               "name": "To",
@@ -85,16 +111,9 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.HEALTHAI_BASE_URL }}/api/automation/reminders/complete",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "x-api-key",
-              "value": "={{ $env.HEALTHAI_AUTOMATION_KEY }}"
-            }
-          ]
-        },
+        "url": "={{ $('Settings').first().json.baseUrl }}/api/automation/reminders/complete",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
         "jsonBody": "={{ JSON.stringify({ jobId: $('One item per reminder').item.json.jobId, status: 'sent', channel: 'whatsapp', providerMessageId: $json.sid }) }}",
@@ -109,19 +128,12 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $env.HEALTHAI_BASE_URL }}/api/automation/reminders/complete",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "x-api-key",
-              "value": "={{ $env.HEALTHAI_AUTOMATION_KEY }}"
-            }
-          ]
-        },
+        "url": "={{ $('Settings').first().json.baseUrl }}/api/automation/reminders/complete",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ jobId: $('One item per reminder').item.json.jobId, status: 'failed', channel: 'whatsapp', error: String($json.error || 'send failed').slice(0, 500) }) }}",
+        "jsonBody": "={{ JSON.stringify({ jobId: $('One item per reminder').item.json.jobId, status: 'failed', channel: 'whatsapp', error: String($json.error?.message || $json.error || 'send failed').slice(0, 500) }) }}",
         "options": {}
       },
       "id": "1a000000-0000-4000-8000-000000000006",
@@ -133,6 +145,9 @@
   ],
   "connections": {
     "Every 5 minutes": {
+      "main": [[{ "node": "Settings", "type": "main", "index": 0 }]]
+    },
+    "Settings": {
       "main": [[{ "node": "Get due reminders", "type": "main", "index": 0 }]]
     },
     "Get due reminders": {
