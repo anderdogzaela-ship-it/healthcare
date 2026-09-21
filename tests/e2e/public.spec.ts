@@ -78,6 +78,24 @@ test.describe('authentication gates', () => {
     });
   }
 
+  test('an email link that landed on the home page is forwarded to the code handler', async ({ request }) => {
+    // Supabase falls back to the Site URL when a redirect is not allow-listed.
+    const response = await request.get('/?code=abc123', { maxRedirects: 0 });
+    expect(response.status()).toBe(307);
+    expect(response.headers()['location']).toContain('/auth/callback?code=abc123');
+  });
+
+  test('a token-hash email link on the home page is forwarded to the confirm handler', async ({ request }) => {
+    const response = await request.get('/?token_hash=xyz&type=email', { maxRedirects: 0 });
+    expect(response.status()).toBe(307);
+    expect(response.headers()['location']).toContain('/auth/confirm?token_hash=xyz&type=email');
+  });
+
+  test('the reset-password page requires the session a reset link creates', async ({ page }) => {
+    await page.goto('/reset-password');
+    await expect(page).toHaveURL(/\/login\?next=%2Freset-password/);
+  });
+
   test('an invitation link sends you to sign in first', async ({ page }) => {
     await page.goto('/invite/not-a-real-token');
     await expect(page).toHaveURL(/\/login\?next=%2Finvite%2Fnot-a-real-token/);

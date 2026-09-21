@@ -17,6 +17,8 @@ export const signInSchema = z.object({
 
 export const emailSchema = z.object({ email: z.string().trim().email() });
 
+export const newPasswordSchema = z.object({ password: z.string().min(8).max(200) });
+
 /**
  * Health log input. The ranges are physiological limits: anything outside is a
  * typo, and letting it into the database would poison later trend analysis.

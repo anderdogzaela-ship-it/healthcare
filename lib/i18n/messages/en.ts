@@ -228,6 +228,16 @@ const en = {
     resetSent: 'If that email has an account, a reset link is on its way.',
     consentRequired: 'Please accept the terms to create your account.',
     consentLabel: 'I agree to the {terms} and the {privacy}, including the processing of my health data.',
+    passwordUpdated: 'Your password has been changed.',
+  },
+  resetPassword: {
+    title: 'Choose a new password',
+    subtitle: 'Enter a new password for your account.',
+    newPassword: 'New password',
+    confirmPassword: 'Confirm new password',
+    submit: 'Update password',
+    saving: 'Updating...',
+    goToDashboard: 'Go to dashboard',
   },
   login: {
     liveOverview: 'Live Health Overview',

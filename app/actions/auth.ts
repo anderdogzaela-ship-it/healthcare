@@ -2,9 +2,9 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, requireUser } from '@/lib/supabase/server';
 import { siteUrl } from '@/lib/supabase/env';
-import { emailSchema, signInSchema, signUpSchema } from '@/lib/validation';
+import { emailSchema, newPasswordSchema, signInSchema, signUpSchema } from '@/lib/validation';
 import type { Messages } from '@/lib/i18n/messages';
 
 /** Keys into messages.auth, so the client renders the text in its own language. */
@@ -103,8 +103,26 @@ export async function requestPasswordReset(formData: FormData): Promise<AuthResu
 
   const supabase = createClient();
   await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo: `${siteUrl()}/auth/callback?next=/settings`,
+    // Lands on the page where the new password is actually chosen.
+    redirectTo: `${siteUrl()}/auth/callback?next=/reset-password`,
   });
 
   return { status: 'success', messageKey: 'resetSent' };
+}
+
+/**
+ * Sets a new password for the signed-in user. Used after a reset link, which
+ * signs the user in through /auth/callback before sending them here.
+ */
+export async function updatePassword(formData: FormData): Promise<AuthResult> {
+  await requireUser();
+
+  const parsed = newPasswordSchema.safeParse({ password: formData.get('password') });
+  if (!parsed.success) return { status: 'error', messageKey: 'weakPassword' };
+
+  const supabase = createClient();
+  const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
+  if (error) return { status: 'error', messageKey: mapAuthError(error.message, error.status) };
+
+  return { status: 'success', messageKey: 'passwordUpdated' };
 }

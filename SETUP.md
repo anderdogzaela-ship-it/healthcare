@@ -70,8 +70,21 @@ In the Supabase dashboard, under **Authentication**:
   while developing if you don't want to open a link for every test account.
 - **URL Configuration → Site URL**: `http://localhost:3000` for development,
   and your real domain in production.
-- **URL Configuration → Redirect URLs**: add `http://localhost:3000/auth/callback`
-  and `https://<your-domain>/auth/callback`.
+- **URL Configuration → Redirect URLs**: add `http://localhost:3000/**` and
+  `https://<your-domain>/**`. The wildcard covers `/auth/callback`,
+  `/auth/confirm` and the `next` parameter the app appends.
+
+  If a redirect is not on this list, Supabase silently sends the user to the
+  Site URL instead. The app forwards such links from `/` to the right handler,
+  so they still work, but configure the list anyway.
+- **Recommended — email templates**: the default templates use a code that must
+  be exchanged in the same browser that signed up, so a link opened on a phone
+  fails. In **Authentication → Email Templates**, change the link in
+  *Confirm signup* to
+  `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`
+  and in *Reset password* to
+  `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery`.
+  Both work on any device.
 - **Emails**: the built-in sender is rate-limited and meant for testing. For
   production, configure your own SMTP (for example Resend) under
   **Project Settings → Authentication → SMTP Settings**.
