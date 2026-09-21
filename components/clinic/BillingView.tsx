@@ -52,13 +52,14 @@ export default function BillingView({ data }: { data: BillingData }) {
 
   const currentPlan = PLANS[data.planId];
 
-  // Without billing the limits are not enforced, so showing them would suggest
-  // a ceiling that does not exist.
+  // Without billing the patient and reminder limits are not enforced, so
+  // showing them would suggest a ceiling that does not exist. Team seats are
+  // always enforced, so their limit is always shown.
   const limitFor = (limit: number | null) => (data.configured ? limit : null);
 
   const usageRows = [
     { label: m.billing.patients, used: data.usage.patients, limit: limitFor(currentPlan.limits.patients) },
-    { label: m.billing.teamMembers, used: data.usage.teamMembers, limit: limitFor(currentPlan.limits.teamMembers) },
+    { label: m.billing.teamMembers, used: data.usage.teamMembers, limit: currentPlan.limits.teamMembers },
     { label: m.billing.reminders, used: data.usage.remindersThisMonth, limit: limitFor(currentPlan.limits.remindersPerMonth) },
   ];
 

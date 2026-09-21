@@ -99,6 +99,7 @@ const es: Messages = {
     revoke: 'Revocar',
     remove: 'Quitar',
     seatLimit: 'Tu plan no tiene más lugares. Mejora el plan para invitar a más personas.',
+    seatLimitFree: 'En el plan gratuito puedes agregar hasta dos personas; mejora tu plan para agregar más.',
     ownerOnly: 'Solo el propietario de la clínica puede administrar el equipo.',
     error: 'Algo salió mal. Inténtalo de nuevo.',
     accept: {
@@ -159,7 +160,7 @@ const es: Messages = {
     manage: 'Administrar facturación',
     opening: 'Abriendo...',
     contactSales: 'Hablar con ventas',
-    notConfigured: 'La facturación no está configurada en este entorno: los planes no se pueden cambiar aquí y sus límites no se aplican.',
+    notConfigured: 'La facturación no está configurada en este entorno: los planes no se pueden cambiar aquí y el límite de pacientes no se aplica.',
     ownerOnly: 'Solo el propietario de la clínica puede cambiar el plan.',
     error: 'Algo salió mal. Inténtalo de nuevo.',
     checkoutSuccess: 'Suscripción actualizada. ¡Gracias!',
@@ -642,7 +643,7 @@ const es: Messages = {
         starter: {
           name: 'Inicial',
           description: 'Para profesionales independientes',
-          features: ['Hasta 100 pacientes', 'Historias y análisis con IA', 'Recordatorios por correo', '1 miembro del equipo', 'Soporte de la comunidad'],
+          features: ['Hasta 100 pacientes', 'Historias y análisis con IA', 'Recordatorios por correo', 'Tú + 2 personas del equipo', 'Soporte de la comunidad'],
           cta: 'Probar gratis',
         },
         clinic: {

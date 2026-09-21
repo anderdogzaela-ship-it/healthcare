@@ -98,6 +98,7 @@ const en = {
     revoke: 'Revoke',
     remove: 'Remove',
     seatLimit: 'Your plan has no seats left. Upgrade to invite more people.',
+    seatLimitFree: 'You can add up to two people on the free plan; please upgrade your plan to add more.',
     ownerOnly: 'Only the clinic owner can manage the team.',
     error: 'Something went wrong. Please try again.',
     accept: {
@@ -158,7 +159,7 @@ const en = {
     manage: 'Manage billing',
     opening: 'Opening...',
     contactSales: 'Talk to sales',
-    notConfigured: 'Billing is not configured in this environment, so plans cannot be changed here and plan limits are not enforced.',
+    notConfigured: 'Billing is not configured in this environment, so plans cannot be changed here and patient limits are not enforced.',
     ownerOnly: 'Only the clinic owner can change the plan.',
     error: 'Something went wrong. Please try again.',
     checkoutSuccess: 'Subscription updated. Thank you!',
@@ -631,7 +632,7 @@ const en = {
         starter: {
           name: 'Starter',
           description: 'For independent practitioners',
-          features: ['Up to 100 patients', 'Health records and AI analysis', 'Email reminders', '1 team member', 'Community support'],
+          features: ['Up to 100 patients', 'Health records and AI analysis', 'Email reminders', 'You + 2 teammates', 'Community support'],
           cta: 'Start free trial',
         },
         clinic: {

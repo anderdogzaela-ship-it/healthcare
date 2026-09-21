@@ -23,7 +23,8 @@ export const PLANS: Record<PlanId, Plan> = {
     id: 'starter',
     monthlyPrice: 29,
     priceEnv: 'STRIPE_PRICE_STARTER',
-    limits: { patients: 100, teamMembers: 1, remindersPerMonth: 200 },
+    // The owner plus two teammates.
+    limits: { patients: 100, teamMembers: 3, remindersPerMonth: 200 },
   },
   clinic: {
     id: 'clinic',

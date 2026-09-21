@@ -198,9 +198,14 @@ configured, **plan limits are enforced**, not just displayed: adding a patient
 or inviting a colleague beyond the plan's limit is refused with an upgrade
 prompt.
 
-Without Stripe, limits are **not** enforced. Nobody could upgrade in that case,
-so enforcing them would only lock people out of features — a dead end in a
-public demo. The billing page says so, and shows usage as unlimited.
+Without Stripe, the patient limit is **not** enforced. Nobody could upgrade in
+that case, so enforcing it would only lock people out of features — a dead end
+in a public demo. The billing page says so, and shows that usage as unlimited.
+
+Team seats are the exception and always apply: the free plan is the owner plus
+two teammates, and pending invitations count as taken seats. A third invitation
+is refused with "You can add up to two people on the free plan; please upgrade
+your plan to add more."
 
 ## Not built yet
 
