@@ -59,6 +59,9 @@ export async function POST(request: Request) {
 
   // Find or create the conversation. RLS guarantees the id belongs to this user.
   let existingId: string | null = null;
+  // A conversation opened by this request is removed again if no answer comes,
+  // so failed attempts do not pile up as empty threads in the sidebar.
+  let createdHere = false;
   if (requestedConversation) {
     const { data } = await supabase
       .from('conversations')
@@ -76,17 +79,22 @@ export async function POST(request: Request) {
       .single();
     if (error || !data) return Response.json({ error: 'failed' }, { status: 500 });
     existingId = data.id;
+    createdHere = true;
   }
 
   // Non-null from here on, which the header and the inserts below rely on.
   const conversationId: string = existingId;
 
-  await supabase.from('messages').insert({
-    conversation_id: conversationId,
-    user_id: user.id,
-    role: 'user',
-    content: userMessage,
-  });
+  const { data: question } = await supabase
+    .from('messages')
+    .insert({
+      conversation_id: conversationId,
+      user_id: user.id,
+      role: 'user',
+      content: userMessage,
+    })
+    .select('id')
+    .single();
 
   const encoder = new TextEncoder();
   const headers = {
@@ -207,6 +215,16 @@ export async function POST(request: Request) {
       } catch (error) {
         console.error(`chat stream failed (provider ${AI_PROVIDER}, model ${MODEL})`, error);
         if (!answer) send('__error__');
+      }
+
+      if (!answer) {
+        // Nothing was answered: leave no trace of the attempt. The question is
+        // still on screen, so the user can simply send it again.
+        if (createdHere) {
+          await supabase.from('conversations').delete().eq('id', conversationId);
+        } else if (question) {
+          await supabase.from('messages').delete().eq('id', question.id);
+        }
       }
 
       if (answer) {
