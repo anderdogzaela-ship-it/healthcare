@@ -8,6 +8,10 @@ info:
     Authenticate with an API key created under Clinic → API and webhooks:
     `Authorization: Bearer hai_...` (the header `x-api-key` also works).
     A key is scoped to one clinic and can never read another clinic's data.
+
+    Each key is either **read only** or **read and write**, chosen when it is
+    created. A read-only key may call every GET endpoint; POST, PATCH and
+    DELETE answer 403 `insufficient_scope`. `GET /me` reports the key's access.
 servers:
   - url: https://your-app.vercel.app/api/v1
 security:
@@ -30,6 +34,7 @@ paths:
                       clinic:
                         $ref: "#/components/schemas/Clinic"
                       authenticated: { type: boolean }
+                      access: { type: string, enum: [read, write] }
                       scopes:
                         type: array
                         items: { type: string }
@@ -88,6 +93,7 @@ paths:
                   data: { $ref: "#/components/schemas/Patient" }
         "400": { $ref: "#/components/responses/InvalidBody" }
         "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/InsufficientScope" }
   /appointments:
     get:
       summary: List appointments
@@ -141,6 +147,7 @@ paths:
                   data: { $ref: "#/components/schemas/Appointment" }
         "400": { $ref: "#/components/responses/InvalidBody" }
         "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/InsufficientScope" }
         "404": { description: The patient does not belong to this clinic }
 components:
   securitySchemes:
@@ -150,6 +157,8 @@ components:
   responses:
     Unauthorized:
       description: Missing, unknown or revoked API key
+    InsufficientScope:
+      description: The key is read-only and the request would change data
     InvalidBody:
       description: Validation failed; `detail` lists the offending fields
   schemas:

@@ -117,6 +117,8 @@ const en = {
     },
   },
   integrations: {
+    scope: 'Access',
+    scopes: { read: 'Read only', write: 'Read and write' },
     title: 'API and webhooks',
     subtitle: 'Connect HealthAI to the tools you already use',
     baseUrl: 'Base URL',

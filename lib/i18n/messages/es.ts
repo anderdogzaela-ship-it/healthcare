@@ -118,6 +118,8 @@ const es: Messages = {
     },
   },
   integrations: {
+    scope: 'Acceso',
+    scopes: { read: 'Solo lectura', write: 'Lectura y escritura' },
     title: 'API y webhooks',
     subtitle: 'Conecta HealthAI con las herramientas que ya usas',
     baseUrl: 'URL base',

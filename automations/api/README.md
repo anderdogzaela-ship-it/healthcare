@@ -14,6 +14,16 @@ curl -H "Authorization: Bearer hai_your_key" \
 A key belongs to one clinic, is stored only as a SHA-256 hash, and is shown in
 full exactly once. If you lose it, create another and revoke the old one.
 
+Each key has an access level, chosen when it is created:
+
+- **Read only** — every `GET` endpoint. `POST`, `PATCH` and `DELETE` answer
+  `403 {"error": "insufficient_scope"}`. Use it for dashboards, reports and
+  anything that only copies data out.
+- **Read and write** — everything. Keys created before access levels existed
+  are read and write.
+
+`GET /me` reports the key's `access` and its `scopes`.
+
 ## Typical calls
 
 ```bash
@@ -121,4 +131,3 @@ to delete the record outright, which is what an erasure request needs.
 ## Limits
 
 - No pagination cursors: `limit` and `offset` only.
-- Keys are all-or-nothing: there are no per-scope permissions yet.

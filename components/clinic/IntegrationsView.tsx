@@ -24,6 +24,7 @@ export interface ApiKeyRow {
   id: string;
   name: string;
   prefix: string;
+  scope: 'read' | 'write';
   lastUsedAt: string | null;
   revokedAt: string | null;
   createdAt: string;
@@ -171,8 +172,12 @@ export default function IntegrationsView({
           )}
 
           {isOwner && (
-            <form onSubmit={submitKey} className="flex gap-2 mb-5">
+            <form onSubmit={submitKey} className="flex flex-col sm:flex-row gap-2 mb-5">
               <input name="name" type="text" placeholder={m.integrations.keyNamePlaceholder} aria-label={m.integrations.keyName} className={inputClass} />
+              <select name="scope" defaultValue="write" aria-label={m.integrations.scope} className={`${inputClass} sm:w-auto`}>
+                <option value="write">{m.integrations.scopes.write}</option>
+                <option value="read">{m.integrations.scopes.read}</option>
+              </select>
               <button
                 type="submit"
                 disabled={pending}
@@ -193,6 +198,13 @@ export default function IntegrationsView({
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">
                       {key.name}
+                      <span
+                        className={`ml-2 text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded-md ${
+                          key.scope === 'read' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-700'
+                        }`}
+                      >
+                        {m.integrations.scopes[key.scope]}
+                      </span>
                       {key.revokedAt && <span className="ml-2 text-xs text-gray-400">({m.integrations.revoked})</span>}
                     </p>
                     <p className="text-xs text-gray-400">

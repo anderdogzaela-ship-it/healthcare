@@ -313,7 +313,6 @@ your plan to add more."
 - **Device sync**: Apple Health, Fitbit and Google Fit are shown as disabled.
 - **Sending invitation emails**: the invitation link is generated and shown to
   the owner to share; no email is sent yet.
-- **Per-scope API permissions**: a key can do everything its clinic can.
 
 ## Working with health data
 

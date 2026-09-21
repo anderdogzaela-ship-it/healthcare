@@ -8,6 +8,7 @@
 
 export type UnitSystem = 'metric' | 'imperial';
 export type AppLocale = 'en' | 'es' | 'pt';
+export type ApiKeyScope = 'read' | 'write';
 export type MeasurementMetric = 'heart_rate' | 'blood_pressure' | 'weight';
 export type GoalMetric = 'steps' | 'sleep_hours' | 'water_glasses';
 export type DataSource = 'manual' | 'fitbit' | 'apple_health' | 'health_connect';
@@ -378,6 +379,7 @@ export interface Database {
           last_used_at: string | null;
           revoked_at: string | null;
           created_at: string;
+          scope: ApiKeyScope;
         };
         Insert: {
           clinic_id: string;
@@ -385,6 +387,7 @@ export interface Database {
           key_hash: string;
           name?: string;
           created_by?: string | null;
+          scope?: ApiKeyScope;
         };
         Update: { name?: string; last_used_at?: string | null; revoked_at?: string | null };
         Relationships: [];
