@@ -172,6 +172,10 @@ supabase/migrations/    SQL schema
 - Patient list export to CSV for clinic owners, with localized headers and
   cells escaped so spreadsheets never run a formula typed into a record
 - Full interface in English, Spanish and Portuguese
+- Privacy policy (`/privacy`) and terms of use (`/terms`) in the three
+  languages, linked from the footer and from the sign-up consent. They describe
+  this demo as it actually runs; a real deployment needs them reviewed by a
+  lawyer and completed with the operator's identity and contact details
 - **Sample data for demos**: Settings → *Sample data* fills the account with
   30 days of fictitious vitals, sleep and activity, plus sample patients,
   notes and appointments in the active clinic. Days the user logged are never

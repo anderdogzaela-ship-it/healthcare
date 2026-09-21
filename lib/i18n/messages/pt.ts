@@ -739,7 +739,6 @@ const pt: Messages = {
         integrations: 'Integrações',
         api: 'API',
         about: 'Sobre',
-        blog: 'Blog',
         contact: 'Contato',
         privacy: 'Privacidade',
         terms: 'Termos',
@@ -841,6 +840,187 @@ const pt: Messages = {
     ctaBody: 'Automações, bots de WhatsApp, assistentes de IA, integrações por API ou um SaaS completo: me mande uma mensagem na Workana contando o que você precisa.',
     ctaDemo: 'Testar a demo ao vivo',
     note: 'Projeto de portfólio. Todos os nomes e dados da demo são fictícios.',
+  },
+  legal: {
+    back: 'Voltar ao site',
+    updated: 'Última atualização: 21 de setembro de 2026',
+    demoNotice: 'O HealthAI é uma demonstração de portfólio, não um serviço médico. Não insira informações de saúde reais nem dados reais de pacientes.',
+    onThisPage: 'Nesta página',
+    privacy: {
+      metaTitle: 'Política de privacidade — HealthAI',
+      title: 'Política de privacidade',
+      intro: 'Esta página explica o que o HealthAI guarda, para quê, quem nos ajuda a operá-lo e quais direitos você tem sobre os seus dados.',
+      sections: [
+        {
+          id: 'who',
+          title: 'Quem somos',
+          paragraphs: [
+            'O HealthAI é um projeto de portfólio criado para mostrar como uma plataforma de saúde pode funcionar. Ele não é operado por uma clínica, hospital ou empresa de saúde e não se destina a pacientes reais.',
+            'Dúvidas sobre esta política podem ser enviadas a quem desenvolveu o projeto, pelo perfil na Workana.',
+          ],
+        },
+        {
+          id: 'data',
+          title: 'O que coletamos',
+          paragraphs: [
+            'Conta: seu nome, e-mail e senha. A senha é guardada apenas de forma cifrada (hash) pelo nosso provedor de autenticação; ninguém consegue lê-la.',
+            'Perfil e preferências: telefone, data de nascimento, fuso horário, idioma, unidades e metas, se você informar.',
+            'Registros de saúde: sinais vitais, sono, atividade, sintomas e notas, e suas conversas com o assistente.',
+            'Dados da clínica: ao usar os recursos de clínica, os pacientes, notas e consultas que você ou seus colegas cadastrarem.',
+            'Dados técnicos: os cookies descritos abaixo e a data do último uso de cada chave de API.',
+          ],
+        },
+        {
+          id: 'use',
+          title: 'Como usamos',
+          paragraphs: [
+            'Apenas para oferecer os recursos que você usa: seu painel e histórico, as respostas do assistente, os lembretes de consulta que sua clínica ativar e as integrações que sua clínica configurar.',
+            'Não vendemos dados, não exibimos publicidade e não criamos perfis para marketing.',
+          ],
+        },
+        {
+          id: 'basis',
+          title: 'Base legal',
+          paragraphs: [
+            'Informações de saúde são dados pessoais sensíveis pela LGPD (artigo 11) e pelo GDPR europeu (artigo 9). Nós as tratamos com base no consentimento explícito que você dá ao criar a conta, e você pode revogá-lo a qualquer momento excluindo a conta.',
+            'Os registros de pacientes cadastrados por uma clínica pertencem a essa clínica, que decide como são usados. Para esses registros, o HealthAI apenas trata os dados em nome da clínica.',
+          ],
+        },
+        {
+          id: 'ai',
+          title: 'O assistente de IA',
+          paragraphs: [
+            'Quando você faz uma pergunta ao assistente, sua mensagem e os registros necessários para responder (por exemplo, o sono da última semana) são enviados ao provedor de IA configurado neste site, atualmente o Google Gemini ou o Anthropic Claude. Somente os seus próprios registros são enviados.',
+            'Mensagens que mencionam uma possível emergência nunca são enviadas a nenhum provedor de IA; em vez disso, você é orientado a procurar atendimento de emergência.',
+            'No plano gratuito de um provedor, ele pode usar as conversas para melhorar seus produtos. Esse é mais um motivo para não inserir informações de saúde reais nesta demo.',
+          ],
+        },
+        {
+          id: 'processors',
+          title: 'Prestadores de serviço',
+          paragraphs: [
+            'O Supabase guarda o banco de dados e cuida do login. A Vercel hospeda a aplicação. O provedor de IA gera as respostas do assistente. O Stripe processa os pagamentos, quando as assinaturas estão ativas. Um provedor de mensagens, conectado pelo n8n, envia os lembretes por WhatsApp, quando uma clínica os ativa.',
+            'Esses prestadores podem tratar dados fora do seu país, conforme os próprios compromissos de segurança e privacidade.',
+          ],
+        },
+        {
+          id: 'security',
+          title: 'Segurança',
+          paragraphs: [
+            'Todas as tabelas do banco de dados usam segurança em nível de linha, então cada pessoa e cada clínica só conseguem ler os próprios registros. As conexões usam HTTPS.',
+            'As chaves de API são guardadas apenas como hash, os webhooks são assinados para poderem ser verificados, e as chaves do provedor de IA, de pagamento e do banco de dados ficam no servidor e nunca chegam ao seu navegador.',
+            'Nenhum sistema é perfeitamente seguro. Se identificarmos um incidente que afete seus dados, avisaremos você e as autoridades, conforme a lei exige.',
+          ],
+        },
+        {
+          id: 'retention',
+          title: 'Por quanto tempo guardamos',
+          paragraphs: [
+            'Enquanto sua conta existir. Quando você exclui a conta, seus registros são excluídos junto; as cópias nos backups dos nossos prestadores expiram nos prazos deles.',
+          ],
+        },
+        {
+          id: 'rights',
+          title: 'Seus direitos',
+          paragraphs: [
+            'Você pode acessar e baixar tudo o que sua conta guarda (Configurações → Seus dados), corrigir seus dados (Configurações → Perfil) e excluir sua conta com os dados (Configurações → Excluir conta).',
+            'Você também pode revogar o consentimento, tirar dúvidas sobre o tratamento dos seus dados e reclamar à autoridade de proteção de dados, que no Brasil é a ANPD.',
+          ],
+        },
+        {
+          id: 'cookies',
+          title: 'Cookies',
+          paragraphs: [
+            'Usamos apenas os cookies de que o site precisa para funcionar: um mantém você conectado, outro lembra seu idioma e outro lembra em qual clínica você está trabalhando. Não há cookies de análise nem de publicidade.',
+          ],
+        },
+        {
+          id: 'changes',
+          title: 'Alterações nesta política',
+          paragraphs: [
+            'Se esta política mudar, esta página será atualizada, junto com a data no topo.',
+          ],
+        },
+      ],
+    },
+    terms: {
+      metaTitle: 'Termos de uso — HealthAI',
+      title: 'Termos de uso',
+      intro: 'Ao criar uma conta ou usar o HealthAI, você concorda com estes termos. Eles são curtos de propósito.',
+      sections: [
+        {
+          id: 'service',
+          title: 'Sobre este serviço',
+          paragraphs: [
+            'O HealthAI é uma demonstração de portfólio gratuita. Os recursos podem mudar e os dados de demonstração podem ser apagados sem aviso.',
+          ],
+        },
+        {
+          id: 'medical',
+          title: 'Não é orientação médica',
+          paragraphs: [
+            'O HealthAI e seu assistente oferecem apenas informações gerais. Eles não fazem diagnóstico, não tratam nem substituem um profissional de saúde, e nada aqui é recomendação sobre medicamentos.',
+            'Em uma emergência, ligue para o número de emergência local (no Brasil, SAMU 192) ou vá ao pronto-socorro mais próximo.',
+          ],
+        },
+        {
+          id: 'account',
+          title: 'Sua conta',
+          paragraphs: [
+            'Informe dados corretos, não compartilhe sua senha e use uma conta por pessoa. Você é responsável pelo que acontece na sua conta.',
+          ],
+        },
+        {
+          id: 'use',
+          title: 'Uso aceitável',
+          paragraphs: [
+            'Não insira dados reais de pacientes sem base legal, não tente acessar dados de outras pessoas, não interrompa o serviço, não contorne os limites de requisições e não o use para nada ilegal.',
+          ],
+        },
+        {
+          id: 'clinics',
+          title: 'Clínicas e seus pacientes',
+          paragraphs: [
+            'A clínica que cadastra pacientes é responsável por ter base legal e o consentimento dos pacientes para os dados que insere e as mensagens que envia a eles, incluindo os lembretes por WhatsApp.',
+          ],
+        },
+        {
+          id: 'api',
+          title: 'API e integrações',
+          paragraphs: [
+            'Mantenha em sigilo as chaves de API e os segredos dos webhooks. Chaves mal utilizadas ou que ultrapassem os limites podem ser revogadas.',
+          ],
+        },
+        {
+          id: 'warranty',
+          title: 'Sem garantias',
+          paragraphs: [
+            'O serviço é oferecido como está, sem garantia de disponibilidade, precisão ou de que os dados serão preservados. Não dependa dele para decisões sobre saúde.',
+          ],
+        },
+        {
+          id: 'liability',
+          title: 'Limitação de responsabilidade',
+          paragraphs: [
+            'Na medida em que a lei permitir, quem desenvolveu o projeto não se responsabiliza por perdas indiretas nem por perdas decorrentes do uso da demo, das informações exibidas nela ou dos dados inseridos nela.',
+          ],
+        },
+        {
+          id: 'ending',
+          title: 'Encerrar o uso',
+          paragraphs: [
+            'Você pode excluir sua conta a qualquer momento em Configurações. Contas que descumprirem estes termos podem ser suspensas.',
+          ],
+        },
+        {
+          id: 'changes',
+          title: 'Alterações e contato',
+          paragraphs: [
+            'Se estes termos mudarem, esta página será atualizada com uma nova data. Dúvidas podem ser enviadas a quem desenvolveu o projeto, pelo perfil na Workana.',
+          ],
+        },
+      ],
+    },
   },
 };
 
