@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import type { ClinicRole, PatientStatus } from '@/lib/supabase/database.types';
 
@@ -27,29 +28,68 @@ export interface ClinicStats {
   noShowRate: number | null;
 }
 
-/** The clinic this user works at, or null if they have not created one. */
-export async function getClinicContext(userId: string): Promise<ClinicContext | null> {
+/** Cookie remembering which clinic a member of several is looking at. */
+export const ACTIVE_CLINIC_COOKIE = 'active_clinic';
+
+export interface ClinicSummary {
+  id: string;
+  name: string;
+  role: ClinicRole;
+}
+
+/** Every clinic this user belongs to, oldest membership first. */
+export async function getUserClinics(userId: string): Promise<ClinicSummary[]> {
   const supabase = createClient();
 
-  const { data: membership } = await supabase
+  const { data: memberships } = await supabase
     .from('clinic_members')
-    .select('clinic_id, role')
+    .select('clinic_id, role, created_at')
     .eq('user_id', userId)
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .maybeSingle();
+    .order('created_at', { ascending: true });
 
-  if (!membership) return null;
+  if (!memberships || memberships.length === 0) return [];
 
+  const { data: clinics } = await supabase
+    .from('clinics')
+    .select('id, name')
+    .in('id', memberships.map((membership) => membership.clinic_id));
+
+  const nameById = new Map((clinics ?? []).map((clinic) => [clinic.id, clinic.name]));
+
+  return memberships
+    .filter((membership) => nameById.has(membership.clinic_id))
+    .map((membership) => ({
+      id: membership.clinic_id,
+      name: nameById.get(membership.clinic_id) ?? '',
+      role: membership.role,
+    }));
+}
+
+/**
+ * The clinic this user is working in, or null if they belong to none.
+ *
+ * Someone can belong to several clinics — their own, plus any they were
+ * invited to. The choice lives in a cookie; it is only a preference, since
+ * membership is checked here and row level security checks it again on every
+ * query, so a forged cookie can select nothing the user could not already see.
+ */
+export async function getClinicContext(userId: string): Promise<ClinicContext | null> {
+  const memberships = await getUserClinics(userId);
+  if (memberships.length === 0) return null;
+
+  const preferred = cookies().get(ACTIVE_CLINIC_COOKIE)?.value;
+  const chosen = memberships.find((membership) => membership.id === preferred) ?? memberships[0];
+
+  const supabase = createClient();
   const { data: clinic } = await supabase
     .from('clinics')
     .select('id, name, timezone, plan')
-    .eq('id', membership.clinic_id)
+    .eq('id', chosen.id)
     .single();
 
   if (!clinic) return null;
 
-  return { id: clinic.id, name: clinic.name, timezone: clinic.timezone, plan: clinic.plan, role: membership.role };
+  return { id: clinic.id, name: clinic.name, timezone: clinic.timezone, plan: clinic.plan, role: chosen.role };
 }
 
 export async function getPatients(clinicId: string, search?: string): Promise<PatientRow[]> {

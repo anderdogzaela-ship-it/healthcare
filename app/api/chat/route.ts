@@ -5,28 +5,23 @@ import { localDate } from '@/lib/data/health';
 import { systemPrompt } from '@/lib/ai/prompt';
 import { runTool, tools } from '@/lib/ai/tools';
 import { EMERGENCY_REPLY, hasRedFlag } from '@/lib/ai/safety';
+import { answerWithGemini } from '@/lib/ai/gemini';
+import {
+  AI_PROVIDER,
+  MODEL,
+  SUPPORTS_EAGER_TOOL_INPUT,
+  SUPPORTS_EFFORT,
+  SUPPORTS_FALLBACKS,
+  aiConfigured,
+  claude,
+} from '@/lib/ai/client';
 
-const MODEL = 'claude-opus-5';
 /** Chat answers are deliberately short, so the cap stays low. */
 const MAX_TOKENS = 4096;
 /** Stops a runaway tool loop. Four rounds is plenty for "compare X and Y". */
 const MAX_TOOL_ROUNDS = 4;
 /** Per-user cost guard. */
 const MESSAGES_PER_HOUR = 40;
-
-let client: Anthropic | null = null;
-
-/**
- * Created on first use, not at import.
- *
- * The SDK throws when the key is missing, and a module-level client would turn
- * that into a failed build for a deployment that simply has no assistant
- * configured yet.
- */
-function anthropic(): Anthropic {
-  if (!client) client = new Anthropic();
-  return client;
-}
 
 export async function POST(request: Request) {
   const user = await getUser();
@@ -42,7 +37,7 @@ export async function POST(request: Request) {
 
   // Say so before storing anything, rather than saving the question and then
   // failing to answer it.
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!aiConfigured()) {
     return Response.json({ error: 'not_configured' }, { status: 503 });
   }
 
@@ -138,7 +133,7 @@ export async function POST(request: Request) {
   // Inputs stream as they are generated; runTool validates before executing.
   const toolParams = tools.map((tool) => ({
     ...tool,
-    eager_input_streaming: true,
+    ...(SUPPORTS_EAGER_TOOL_INPUT && { eager_input_streaming: true }),
   })) as unknown as Anthropic.Beta.BetaToolUnion[];
 
   const stream = new ReadableStream<Uint8Array>({
@@ -147,16 +142,31 @@ export async function POST(request: Request) {
       let answer = '';
 
       try {
-        for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-          const turn = anthropic().beta.messages.stream({
+        if (AI_PROVIDER === 'gemini') {
+          answer = await answerWithGemini({
+            model: MODEL,
+            system: system.map((block) => block.text).join('\n\n'),
+            history: (history ?? []).map((row) => ({
+              role: row.role === 'ai' ? ('assistant' as const) : ('user' as const),
+              content: row.content,
+            })),
+            userId: user.id,
+            maxTokens: MAX_TOKENS,
+            maxToolRounds: MAX_TOOL_ROUNDS,
+            send,
+          });
+        } else for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+          const turn = claude().beta.messages.stream({
             model: MODEL,
             max_tokens: MAX_TOKENS,
             // Opus 5 can decline a request; "default" re-runs it on a fallback
             // model instead of returning nothing.
-            betas: ['server-side-fallback-2026-07-01'],
-            fallbacks: 'default',
+            ...(SUPPORTS_FALLBACKS && {
+              betas: ['server-side-fallback-2026-07-01'],
+              fallbacks: 'default' as const,
+            }),
             // Chat does not need the deepest reasoning; medium keeps it quick.
-            output_config: { effort: 'medium' },
+            ...(SUPPORTS_EFFORT && { output_config: { effort: 'medium' as const } }),
             system,
             messages,
             tools: toolParams,

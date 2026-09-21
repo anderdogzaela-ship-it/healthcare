@@ -79,6 +79,7 @@ const es: Messages = {
     billingLink: 'Plan y facturación',
     integrationsLink: 'API y webhooks',
     teamLink: 'Equipo',
+    switchClinic: 'Cambiar de clínica',
   },
   team: {
     title: 'Equipo',

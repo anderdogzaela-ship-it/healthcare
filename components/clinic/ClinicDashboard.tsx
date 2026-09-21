@@ -10,7 +10,7 @@ import {
 import { useI18n } from '@/lib/i18n/I18nProvider';
 import { createPatient } from '@/app/actions/clinic';
 import { locales, localeNames, type Locale } from '@/lib/i18n/config';
-import type { ClinicContext, ClinicStats, PatientRow } from '@/lib/data/clinic';
+import type { ClinicContext, ClinicStats, ClinicSummary, PatientRow } from '@/lib/data/clinic';
 import type { Messages } from '@/lib/i18n/messages';
 
 type PatientStatus = keyof Messages['clinic']['statuses'];
@@ -24,11 +24,13 @@ const statusStyles: Record<PatientStatus, string> = {
 
 export default function ClinicDashboard({
   clinic,
+  clinics,
   stats,
   patients,
   search,
 }: {
   clinic: ClinicContext;
+  clinics: ClinicSummary[];
   stats: ClinicStats;
   patients: PatientRow[];
   search: string;
@@ -83,6 +85,26 @@ export default function ClinicDashboard({
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl lg:text-3xl font-bold text-gray-900" style={{ fontFamily: 'Nunito, sans-serif' }}>{clinic.name}</h1>
+          {clinics.length > 1 && (
+            <label className="mt-2 inline-flex items-center gap-2 text-sm text-gray-500">
+              {m.clinic.switchClinic}
+              <select
+                value={clinic.id}
+                // A full navigation through the switch route, which is the
+                // only place allowed to remember the choice.
+                onChange={(event) => {
+                  window.location.href = `/api/clinic/switch?id=${event.target.value}&next=/clinic`;
+                }}
+                className="px-3 py-1.5 rounded-xl border border-gray-200 bg-white text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+              >
+                {clinics.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.name} · {m.clinic.roles[option.role]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           <p className="text-gray-500 mt-1">
             {m.clinic.subtitle} · <span className="text-gray-400">{m.clinic.roles[clinic.role]}</span>
           </p>

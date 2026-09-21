@@ -78,6 +78,7 @@ const en = {
     billingLink: 'Plan and billing',
     integrationsLink: 'API and webhooks',
     teamLink: 'Team',
+    switchClinic: 'Switch clinic',
   },
   team: {
     title: 'Team',

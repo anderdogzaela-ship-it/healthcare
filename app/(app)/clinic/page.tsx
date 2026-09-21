@@ -1,5 +1,5 @@
 import { createClient, requireUser } from '@/lib/supabase/server';
-import { getClinicContext, getClinicStats, getPatients } from '@/lib/data/clinic';
+import { getClinicContext, getClinicStats, getPatients, getUserClinics } from '@/lib/data/clinic';
 import ClinicOnboarding from '@/components/clinic/ClinicOnboarding';
 import ClinicDashboard from '@/components/clinic/ClinicDashboard';
 
@@ -14,7 +14,11 @@ export default async function ClinicPage({ searchParams }: { searchParams: { q?:
   }
 
   const search = searchParams.q ?? '';
-  const [stats, patients] = await Promise.all([getClinicStats(clinic.id), getPatients(clinic.id, search)]);
+  const [stats, patients, clinics] = await Promise.all([
+    getClinicStats(clinic.id),
+    getPatients(clinic.id, search),
+    getUserClinics(user.id),
+  ]);
 
-  return <ClinicDashboard clinic={clinic} stats={stats} patients={patients} search={search} />;
+  return <ClinicDashboard clinic={clinic} clinics={clinics} stats={stats} patients={patients} search={search} />;
 }

@@ -17,6 +17,12 @@ export type TeamResult =
 
 export type AcceptResult = 'accepted' | 'already' | 'expired' | 'invalid' | 'wrongAccount';
 
+/** What happened, and which clinic to open next when it worked. */
+export interface AcceptOutcome {
+  result: AcceptResult;
+  clinicId: string | null;
+}
+
 const inviteSchema = z.object({
   email: z.string().trim().email().max(200),
   role: z.enum(['owner', 'professional', 'receptionist']),
@@ -117,9 +123,9 @@ export async function removeMember(formData: FormData): Promise<TeamResult> {
  * happens here: the token hash, the expiry, and that the invitation was
  * addressed to this account's email.
  */
-export async function acceptInvitation(token: string): Promise<AcceptResult> {
+export async function acceptInvitation(token: string): Promise<AcceptOutcome> {
   const user = await requireUser();
-  if (!token || token.length < 16) return 'invalid';
+  if (!token || token.length < 16) return { result: 'invalid', clinicId: null };
 
   const admin = createAdminClient();
   const { data: invitation } = await admin
@@ -128,11 +134,14 @@ export async function acceptInvitation(token: string): Promise<AcceptResult> {
     .eq('token_hash', hashToken(token))
     .maybeSingle();
 
-  if (!invitation || invitation.revoked_at) return 'invalid';
-  if (invitation.accepted_at) return 'already';
-  if (new Date(invitation.expires_at).getTime() < Date.now()) return 'expired';
+  if (!invitation || invitation.revoked_at) return { result: 'invalid', clinicId: null };
+  // Already used: still point them at the clinic, which is what they want.
+  if (invitation.accepted_at) return { result: 'already', clinicId: invitation.clinic_id };
+  if (new Date(invitation.expires_at).getTime() < Date.now()) return { result: 'expired', clinicId: null };
 
-  if ((user.email ?? '').toLowerCase() !== invitation.email.toLowerCase()) return 'wrongAccount';
+  if ((user.email ?? '').toLowerCase() !== invitation.email.toLowerCase()) {
+    return { result: 'wrongAccount', clinicId: null };
+  }
 
   const { error } = await admin
     .from('clinic_members')
@@ -141,15 +150,15 @@ export async function acceptInvitation(token: string): Promise<AcceptResult> {
       { onConflict: 'clinic_id,user_id' }
     );
 
-  if (error) return 'invalid';
+  if (error) return { result: 'invalid', clinicId: null };
 
   await admin
     .from('clinic_invitations')
     .update({ accepted_at: new Date().toISOString(), accepted_by: user.id })
     .eq('id', invitation.id);
 
-  // No revalidatePath here: this runs while the invite page renders, and
-  // revalidating during render is not allowed. Clinic pages read cookies, so
-  // they are dynamic and will show the new membership anyway.
-  return 'accepted';
+  // No revalidatePath or cookie here: this runs while the invite page renders,
+  // where neither is allowed. The page links through /api/clinic/switch, which
+  // selects this clinic.
+  return { result: 'accepted', clinicId: invitation.clinic_id };
 }
