@@ -39,10 +39,24 @@ export function supabaseConfigured(): boolean {
   );
 }
 
-/** Absolute base URL, used for email confirmation and reset links. */
+/**
+ * Absolute base URL for links that leave the app: email confirmation, password
+ * reset, invitations, and the API base shown to integrators.
+ *
+ * Order matters. VERCEL_URL is unique to each deployment, changes on every
+ * push, and usually sits behind Vercel's deployment protection — a link built
+ * from it breaks for anyone who is not signed in to Vercel. So it is the last
+ * resort, after the project's production domain and the branch's stable URL.
+ */
 export function siteUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '');
-  // Vercel sets this automatically for preview and production deployments.
+
+  // Vercel system variables, most stable first.
+  if (process.env.VERCEL_ENV === 'production' && process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.VERCEL_BRANCH_URL) return `https://${process.env.VERCEL_BRANCH_URL}`;
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+
   return 'http://localhost:3000';
 }
