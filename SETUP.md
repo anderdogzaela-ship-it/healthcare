@@ -284,6 +284,28 @@ be picked up by mistake.
 On Bedrock, server-side fallbacks are not available, so a declined request
 shows the usual error message instead of being retried on another model.
 
+## Weekly report and email (optional)
+
+`/report` shows the last seven days next to the seven before: sleep, steps and
+goals, workouts, heart rate, blood pressure, weight and symptoms. It needs no
+configuration and is linked from the dashboard.
+
+To also send it by email:
+
+1. Create an account at [resend.com](https://resend.com) (free tier) and an API
+   key, then set `RESEND_API_KEY`.
+2. Verify a domain you own in Resend and set `EMAIL_FROM`, for example
+   `HealthAI <reports@your-domain.com>`. Without a verified domain Resend only
+   delivers to the address you signed up with, which is enough to try it on
+   yourself but not for other users.
+3. Redeploy.
+
+Then the report page gets a *Send to my email* button, and a Vercel Cron job
+(`/api/cron/weekly-report`, Mondays 09:00 UTC) emails everyone who has
+*Weekly health report* on in Settings. Weeks with nothing logged are skipped,
+and a run handles at most 100 people. The job accepts `CRON_SECRET` like the
+other cron route, or the automation key, so n8n can run it instead.
+
 ## Billing (optional)
 
 Leave the Stripe variables empty and the app still runs: every clinic stays on
