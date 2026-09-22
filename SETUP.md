@@ -176,6 +176,9 @@ supabase/migrations/    SQL schema
   languages, linked from the footer and from the sign-up consent. They describe
   this demo as it actually runs; a real deployment needs them reviewed by a
   lawyer and completed with the operator's identity and contact details
+- **WhatsApp simulator** (Clinic → WhatsApp simulator): reminders and
+  patient replies on a phone-like screen, running through the same logic as
+  the live integration, for demos without a WhatsApp provider
 - **Sample data for demos**: Settings → *Sample data* fills the account with
   30 days of fictitious vitals, sleep and activity, plus sample patients,
   notes and appointments in the active clinic. Days the user logged are never

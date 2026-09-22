@@ -128,7 +128,7 @@ test.describe('languages', () => {
 });
 
 test.describe('authentication gates', () => {
-  const protectedRoutes = ['/dashboard', '/health', '/appointments', '/clinic', '/chat', '/activity', '/settings', '/report'];
+  const protectedRoutes = ['/dashboard', '/health', '/appointments', '/clinic', '/chat', '/activity', '/settings', '/report', '/clinic/whatsapp'];
 
   for (const route of protectedRoutes) {
     test(`${route} redirects a signed-out visitor to login`, async ({ page }) => {

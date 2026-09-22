@@ -22,7 +22,7 @@ export async function POST(request: Request) {
 
   const { data: job } = await admin
     .from('reminder_jobs')
-    .select('id, user_id, appointment_id, kind')
+    .select('id, user_id, patient_id, appointment_id, kind')
     .eq('id', jobId)
     .single();
 
@@ -40,6 +40,9 @@ export async function POST(request: Request) {
 
   await admin.from('automation_events').insert({
     user_id: job.user_id,
+    // Clinic patients have no user id; without this the event would belong
+    // to nobody and never show in that patient's history.
+    patient_id: job.patient_id,
     appointment_id: job.appointment_id,
     direction: 'outbound',
     channel,

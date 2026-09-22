@@ -38,22 +38,63 @@ needs the clinic's calendar.
 
 ## Setup
 
-1. **Import the workflows.** In n8n: *Workflows → Import from file* for both
-   files in `n8n/`.
-2. **Set the environment variables** available to n8n:
-   - `HEALTHAI_BASE_URL` — e.g. `https://your-app.vercel.app`
-   - `HEALTHAI_AUTOMATION_KEY` — the same value as `AUTOMATION_API_KEY`
-   - `TWILIO_ACCOUNT_SID`, `TWILIO_WHATSAPP_FROM` (e.g. `whatsapp:+14155238886`)
-3. **Add an HTTP Basic Auth credential** in n8n with your Twilio Account SID as
-   the user and the Auth Token as the password, and select it on both HTTP
-   nodes that call Twilio.
-4. **Point Twilio at n8n.** In the Twilio console, set the WhatsApp sandbox
-   inbound webhook to the production URL of the `WhatsApp webhook` node.
-5. **Activate both workflows.**
+The workflows need no environment variables, so they run on n8n Cloud as well
+as on a self-hosted n8n. Plain settings live in a **Settings** node at the
+start of each workflow; keys live in n8n credentials, which n8n encrypts.
 
-The Twilio WhatsApp sandbox is enough for a demo: each tester joins the sandbox
-once from their phone. A real WhatsApp Business sender needs Meta verification,
-which takes days and changes nothing about this setup.
+1. **In the app (Vercel):** set `AUTOMATION_API_KEY` to a random value of at
+   least 24 characters and redeploy. The same value goes into n8n in step 3.
+2. **In Twilio:** create an account, open *Messaging → Try it out → Send a
+   WhatsApp message*, and join the sandbox from your phone by sending the code
+   shown there. Note the sandbox number (for example `+14155238886`), your
+   **Account SID** and your **Auth Token**.
+3. **In n8n, create two credentials** (*Credentials → Add credential*):
+   - **Header Auth**, named `HealthAI automation key`: name `x-api-key`, value
+     the `AUTOMATION_API_KEY` from step 1.
+   - **Basic Auth**, named `Twilio`: user = Account SID, password = Auth Token.
+4. **Import both workflows** (*Workflows → Import from file*, the two files in
+   `n8n/`). In each one:
+   - open **Settings** and fill in `baseUrl` (your site, no trailing slash),
+     `twilioAccountSid` and `whatsappFrom` (`whatsapp:` + the sandbox number);
+   - in the inbound workflow, also set `webhookToken` to a long random value;
+   - on every HTTP node, pick the matching credential: `HealthAI automation
+     key` on the ones that call the app, `Twilio` on the ones that call Twilio.
+5. **Point Twilio at n8n.** In the sandbox settings, set *When a message comes
+   in* to the **production** URL of the `WhatsApp webhook` node followed by
+   `?token=` and your `webhookToken`, method `POST`.
+6. **Activate both workflows.**
+
+The token in step 5 matters: without it, anyone who found the webhook URL
+could post a fake reply "from" a patient's number and confirm or cancel their
+appointment. Requests without the right token get `403`. (Checking Twilio's
+request signature would be stronger still; it needs a Code node with the
+`crypto` module, which some n8n Cloud plans do not allow.)
+
+### Trying it end to end
+
+1. Put the phone that joined the sandbox on a record: your own profile
+   (Settings → phone) for a personal appointment, or a clinic patient.
+2. Book an appointment a little over two hours ahead, say 2 h 05 min. Its
+   2-hour reminder becomes due five minutes later; the 24-hour one is skipped
+   because its time has passed.
+3. Within the next five-minute run of n8n the message arrives. Answer `sim`,
+   `no` or `remarcar`, and the appointment changes status in the app.
+
+The Twilio sandbox is enough for a demo: each tester joins it once from their
+phone. Messaging any patient without that step needs a WhatsApp Business
+sender approved by Meta, which takes days and changes nothing else here.
+
+## Demo without any provider: the WhatsApp simulator
+
+*Clinic → WhatsApp simulator* (`/clinic/whatsapp`) shows the flow on a
+phone-like screen: send a patient their 24-hour or 2-hour reminder, reply as
+the patient (quick replies in their language, or free text), and watch the
+appointment change status. Nothing reaches a real phone, but replies go
+through the same handler as the live route (`lib/automation/inbound.ts`), so
+the appointment really changes, pending reminders are really stopped and the
+clinic's webhooks really fire, with `source: "whatsapp_simulator"`. Simulated
+messages are stored as automation events marked `simulated`, and a simulated
+reminder does not touch the real reminder schedule.
 
 ## Testing without n8n
 
@@ -68,9 +109,9 @@ curl -s -X POST -H "x-api-key: $AUTOMATION_API_KEY" -H "content-type: applicatio
   "$BASE_URL/api/automation/whatsapp/inbound" | python -m json.tool
 ```
 
-The number must match the phone saved on a user's profile, otherwise the route
-answers `{ "matched": false }` — it never reveals whether a number has an
-account.
+The number must match a phone saved on an app user's profile or on a clinic's
+patient record, otherwise the route answers `{ "matched": false }` — it never
+reveals whether a number is known.
 
 ## Zapier and Make
 
