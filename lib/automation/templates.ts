@@ -1,4 +1,4 @@
-import type { Locale } from '@/lib/i18n/config';
+import { localeTags, type Locale } from '@/lib/i18n/config';
 
 /**
  * Messages sent over WhatsApp. They live here rather than in the UI
@@ -95,4 +95,32 @@ export function detectIntent(text: string): Intent {
   if (words.some((word) => strip(CONFIRM_WORDS).includes(word))) return 'confirm';
   if (words.some((word) => strip(CANCEL_WORDS).includes(word))) return 'cancel';
   return 'unknown';
+}
+
+/**
+ * The reminder text for one appointment, as the patient will read it: in
+ * their language, with the time in their timezone. Used by the scheduler
+ * endpoint and by the in-app WhatsApp simulator, so both say the same thing.
+ */
+export function composeReminder(
+  kind: '24h' | '2h' | 'follow_up',
+  recipient: { name: string | null; locale: string; timezone: string | null },
+  appointment: { starts_at: string; professional: string; location: string | null }
+): { locale: Locale; message: string } {
+  const locale: Locale = recipient.locale === 'es' || recipient.locale === 'pt' ? recipient.locale : 'en';
+  const when = new Intl.DateTimeFormat(localeTags[locale], {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: recipient.timezone || 'UTC',
+  }).format(new Date(appointment.starts_at));
+
+  return {
+    locale,
+    message: reminderMessage(kind, locale, {
+      firstName: (recipient.name ?? '').split(' ')[0],
+      when,
+      professional: appointment.professional,
+      location: appointment.location,
+    }),
+  };
 }

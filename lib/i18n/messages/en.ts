@@ -1046,6 +1046,27 @@ const en = {
       footer: 'You receive this email because the weekly report is turned on in Settings. You can turn it off there at any time.',
     },
   },
+  simulator: {
+    title: 'WhatsApp simulator',
+    subtitle: 'See reminders and replies exactly as a patient would, without a WhatsApp account.',
+    notice: 'Simulation: nothing is sent to a real phone. Replies run through the same logic as the live WhatsApp integration, so the appointment really changes and your webhooks really fire.',
+    back: 'Back to clinic',
+    link: 'WhatsApp simulator',
+    patients: 'Patients',
+    noPatients: 'No patients yet. Add one, or load sample data in Settings.',
+    noUpcoming: 'No upcoming appointment. Book one for this patient to send a reminder.',
+    noUpcomingShort: 'No upcoming appointment',
+    noPhone: 'No phone number on file: the live integration would skip this patient.',
+    phoneOf: 'Phone of',
+    send24h: 'Send 24-hour reminder',
+    send2h: 'Send 2-hour reminder',
+    placeholder: 'Reply as the patient…',
+    send: 'Send',
+    empty: 'No messages yet. Send a reminder, or type a reply as the patient.',
+    simulated: 'simulated',
+    liveReminder: 'Reminder ({kind}) sent by the live integration',
+    error: 'Something went wrong. Please try again.',
+  },
 };
 
 export type Messages = typeof en;

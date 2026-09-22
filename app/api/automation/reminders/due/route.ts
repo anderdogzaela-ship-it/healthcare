@@ -1,7 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { isAuthorizedAutomation, unauthorized } from '@/lib/automation/auth';
-import { reminderMessage } from '@/lib/automation/templates';
-import { localeTags, isLocale } from '@/lib/i18n/config';
+import { composeReminder } from '@/lib/automation/templates';
 
 /**
  * Reminders that are due to be sent.
@@ -87,12 +86,7 @@ export async function GET(request: Request) {
       continue;
     }
 
-    const locale = isLocale(recipient.locale) ? recipient.locale : 'en';
-    const when = new Intl.DateTimeFormat(localeTags[locale], {
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: recipient.timezone || 'UTC',
-    }).format(new Date(appointment.starts_at));
+    const { locale, message } = composeReminder(job.kind, recipient, appointment);
 
     claim.push(job.id);
     reminders.push({
@@ -102,12 +96,7 @@ export async function GET(request: Request) {
       phone: recipient.phone,
       locale,
       startsAt: appointment.starts_at,
-      message: reminderMessage(job.kind, locale, {
-        firstName: (recipient.name ?? '').split(' ')[0],
-        when,
-        professional: appointment.professional,
-        location: appointment.location,
-      }),
+      message,
     });
   }
 

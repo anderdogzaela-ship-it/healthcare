@@ -1060,6 +1060,27 @@ const pt: Messages = {
       footer: 'Você recebe este e-mail porque o relatório semanal está ativado em Configurações. Você pode desativá-lo lá a qualquer momento.',
     },
   },
+  simulator: {
+    title: 'Simulador de WhatsApp',
+    subtitle: 'Veja os lembretes e as respostas exatamente como um paciente veria, sem conta de WhatsApp.',
+    notice: 'Simulação: nada é enviado para um celular de verdade. As respostas passam pela mesma lógica da integração real de WhatsApp, então a consulta muda de verdade e os seus webhooks disparam de verdade.',
+    back: 'Voltar à clínica',
+    link: 'Simulador de WhatsApp',
+    patients: 'Pacientes',
+    noPatients: 'Ainda não há pacientes. Cadastre um ou carregue dados de exemplo em Configurações.',
+    noUpcoming: 'Nenhuma consulta futura. Agende uma para este paciente para enviar um lembrete.',
+    noUpcomingShort: 'Sem consulta futura',
+    noPhone: 'Sem telefone cadastrado: a integração real pularia este paciente.',
+    phoneOf: 'Celular de',
+    send24h: 'Enviar lembrete de 24 horas',
+    send2h: 'Enviar lembrete de 2 horas',
+    placeholder: 'Responda como o paciente…',
+    send: 'Enviar',
+    empty: 'Ainda não há mensagens. Envie um lembrete ou digite uma resposta como o paciente.',
+    simulated: 'simulado',
+    liveReminder: 'Lembrete ({kind}) enviado pela integração real',
+    error: 'Algo deu errado. Tente novamente.',
+  },
 };
 
 export default pt;

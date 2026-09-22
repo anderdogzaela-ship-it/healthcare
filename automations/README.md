@@ -84,6 +84,18 @@ The Twilio sandbox is enough for a demo: each tester joins it once from their
 phone. Messaging any patient without that step needs a WhatsApp Business
 sender approved by Meta, which takes days and changes nothing else here.
 
+## Demo without any provider: the WhatsApp simulator
+
+*Clinic → WhatsApp simulator* (`/clinic/whatsapp`) shows the flow on a
+phone-like screen: send a patient their 24-hour or 2-hour reminder, reply as
+the patient (quick replies in their language, or free text), and watch the
+appointment change status. Nothing reaches a real phone, but replies go
+through the same handler as the live route (`lib/automation/inbound.ts`), so
+the appointment really changes, pending reminders are really stopped and the
+clinic's webhooks really fire, with `source: "whatsapp_simulator"`. Simulated
+messages are stored as automation events marked `simulated`, and a simulated
+reminder does not touch the real reminder schedule.
+
 ## Testing without n8n
 
 ```bash

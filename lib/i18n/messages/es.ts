@@ -1057,6 +1057,27 @@ const es: Messages = {
       footer: 'Recibes este correo porque el informe semanal está activado en Configuración. Puedes desactivarlo allí cuando quieras.',
     },
   },
+  simulator: {
+    title: 'Simulador de WhatsApp',
+    subtitle: 'Mira los recordatorios y las respuestas tal como los vería un paciente, sin una cuenta de WhatsApp.',
+    notice: 'Simulación: no se envía nada a un teléfono real. Las respuestas pasan por la misma lógica que la integración real de WhatsApp, así que la cita cambia de verdad y tus webhooks se disparan de verdad.',
+    back: 'Volver a la clínica',
+    link: 'Simulador de WhatsApp',
+    patients: 'Pacientes',
+    noPatients: 'Todavía no hay pacientes. Agrega uno o carga datos de ejemplo en Configuración.',
+    noUpcoming: 'No hay citas próximas. Agenda una para este paciente para enviar un recordatorio.',
+    noUpcomingShort: 'Sin citas próximas',
+    noPhone: 'Sin número de teléfono registrado: la integración real omitiría a este paciente.',
+    phoneOf: 'Teléfono de',
+    send24h: 'Enviar recordatorio de 24 horas',
+    send2h: 'Enviar recordatorio de 2 horas',
+    placeholder: 'Responde como el paciente…',
+    send: 'Enviar',
+    empty: 'Todavía no hay mensajes. Envía un recordatorio o escribe una respuesta como el paciente.',
+    simulated: 'simulado',
+    liveReminder: 'Recordatorio ({kind}) enviado por la integración real',
+    error: 'Algo salió mal. Inténtalo de nuevo.',
+  },
 };
 
 export default es;
